@@ -1,30 +1,96 @@
 import json
 import random
 import os
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
 
-def migrate_users():
-    """Migra usuários existentes para nova estrutura"""
-    users = load_users()
-    updated = False
+def init_db():
+    """Inicializa o banco de dados"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
     
-    for username, user_data in users.items():
-        if 'max_combo' not in user_data:
-            user_data['max_combo'] = user_data.get('combo', 0)
-            updated = True
-        if 'answered_questions' not in user_data:
-            user_data['answered_questions'] = []
-            updated = True
-        if 'achievements' not in user_data:
-            user_data['achievements'] = []
-            updated = True
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            senha TEXT NOT NULL,
+            turma TEXT NOT NULL,
+            pontuacao INTEGER DEFAULT 0,
+            combo INTEGER DEFAULT 0,
+            max_combo INTEGER DEFAULT 0,
+            is_teacher BOOLEAN DEFAULT 0
+        )
+    ''')
     
-    if updated:
-        save_users(users)
-        print("Usuários migrados com sucesso!")
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            question_id INTEGER,
+            is_correct BOOLEAN,
+            FOREIGN KEY (username) REFERENCES users (username)
+        )
+    ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_achievements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            achievement_key TEXT,
+            FOREIGN KEY (username) REFERENCES users (username)
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+def migrate_from_json():
+    """Migra dados do JSON para SQLite"""
+    try:
+        with open('users.json', 'r', encoding='utf-8') as f:
+            users_data = json.load(f)
+        
+        conn = sqlite3.connect('quiz.db')
+        cursor = conn.cursor()
+        
+        for username, data in users_data.items():
+            cursor.execute('''
+                INSERT OR REPLACE INTO users 
+                (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                username,
+                data.get('senha', ''),
+                data.get('turma', ''),
+                data.get('pontuacao', 0),
+                data.get('combo', 0),
+                data.get('max_combo', data.get('combo', 0)),
+                data.get('is_teacher', False)
+            ))
+            
+            # Migra questões respondidas
+            for q_id in data.get('answered_questions', []):
+                is_correct = q_id in data.get('correct_questions', [])
+                cursor.execute('''
+                    INSERT OR IGNORE INTO user_questions 
+                    (username, question_id, is_correct) VALUES (?, ?, ?)
+                ''', (username, q_id, is_correct))
+            
+            # Migra achievements
+            for achievement in data.get('achievements', []):
+                cursor.execute('''
+                    INSERT OR IGNORE INTO user_achievements 
+                    (username, achievement_key) VALUES (?, ?)
+                ''', (username, achievement))
+        
+        conn.commit()
+        conn.close()
+        print("Migração do JSON para SQLite concluída!")
+        
+    except FileNotFoundError:
+        print("Arquivo users.json não encontrado, pulando migração.")
 
 def create_teacher_account():
     """Cria conta de professor se não existir"""
@@ -32,20 +98,15 @@ def create_teacher_account():
     teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
     teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
     
-    users = load_users()
-    if teacher_username not in users:
-        users[teacher_username] = {
+    if not get_user(teacher_username):
+        save_user(teacher_username, {
             'senha': teacher_password,
             'turma': teacher_turma,
             'pontuacao': 0,
             'combo': 0,
             'max_combo': 0,
-            'correct_questions': [],
-            'answered_questions': [],
-            'achievements': [],
             'is_teacher': True
-        }
-        save_users(users)
+        })
         print(f"Conta de professor '{teacher_username}' criada com sucesso!")
 
 def load_questions():
@@ -144,16 +205,99 @@ def check_new_achievements(user_data, rank=999):
     user_data['achievements'] = list(user_achievements)
     return new_achievements
 
-def load_users():
-    try:
-        with open('users.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+def get_user(username):
+    """Busca um usuário no banco"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+    user_row = cursor.fetchone()
+    
+    if not user_row:
+        conn.close()
+        return None
+    
+    # Busca questões respondidas
+    cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = ?', (username,))
+    questions = cursor.fetchall()
+    
+    # Busca achievements
+    cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = ?', (username,))
+    achievements = [row[0] for row in cursor.fetchall()]
+    
+    conn.close()
+    
+    return {
+        'senha': user_row[1],
+        'turma': user_row[2],
+        'pontuacao': user_row[3],
+        'combo': user_row[4],
+        'max_combo': user_row[5],
+        'is_teacher': bool(user_row[6]),
+        'answered_questions': [q[0] for q in questions],
+        'correct_questions': [q[0] for q in questions if q[1]],
+        'achievements': achievements
+    }
 
-def save_users(users):
-    with open('users.json', 'w', encoding='utf-8') as f:
-        json.dump(users, f, indent=4, ensure_ascii=False)
+def save_user(username, user_data):
+    """Salva um usuário no banco"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT OR REPLACE INTO users 
+        (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        username,
+        user_data.get('senha', ''),
+        user_data.get('turma', ''),
+        user_data.get('pontuacao', 0),
+        user_data.get('combo', 0),
+        user_data.get('max_combo', 0),
+        user_data.get('is_teacher', False)
+    ))
+    
+    conn.commit()
+    conn.close()
+
+def get_all_users():
+    """Busca todos os usuários"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT username, turma, pontuacao FROM users ORDER BY pontuacao DESC')
+    users = cursor.fetchall()
+    
+    conn.close()
+    
+    return [{'nome': u[0], 'turma': u[1], 'pontuacao': u[2]} for u in users]
+
+def add_user_question(username, question_id, is_correct):
+    """Adiciona uma questão respondida"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT OR IGNORE INTO user_questions 
+        (username, question_id, is_correct) VALUES (?, ?, ?)
+    ''', (username, question_id, is_correct))
+    
+    conn.commit()
+    conn.close()
+
+def add_user_achievement(username, achievement_key):
+    """Adiciona um achievement"""
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT OR IGNORE INTO user_achievements 
+        (username, achievement_key) VALUES (?, ?)
+    ''', (username, achievement_key))
+    
+    conn.commit()
+    conn.close()
 
 @app.route('/', methods=['GET', 'POST'])
 def login_register():
@@ -161,7 +305,6 @@ def login_register():
         return redirect(url_for('perfil'))
         
     if request.method == 'POST':
-        users = load_users()
         username = request.form['nome'].strip()
         password = request.form['senha']
         action = request.form.get('action')
@@ -171,21 +314,17 @@ def login_register():
             if not username or not password or not turma:
                 flash("Todos os campos são obrigatórios para o cadastro!", "error")
                 return redirect(url_for('login_register'))
-            if username in users:
+            if get_user(username):
                 flash("Este nome de usuário já existe!", "error")
                 return redirect(url_for('login_register'))
 
-            users[username] = {
+            save_user(username, {
                 'senha': password, 
                 'turma': turma, 
                 'pontuacao': 0, 
                 'combo': 0, 
-                'max_combo': 0,
-                'correct_questions': [], 
-                'answered_questions': [], 
-                'achievements': []
-            }
-            save_users(users)
+                'max_combo': 0
+            })
             session['username'] = username
             session['pontuacao'] = 0
             session['combo'] = 0
@@ -193,7 +332,7 @@ def login_register():
             return redirect(url_for('perfil'))
 
         elif action == 'login':
-            user = users.get(username)
+            user = get_user(username)
             if user and user['senha'] == password:
                 session['username'] = username
                 session['pontuacao'] = user['pontuacao']
@@ -217,9 +356,8 @@ def perfil():
     if 'username' not in session:
         return redirect(url_for('login_register'))
 
-    users = load_users()
     username = session['username']
-    user_data = users.get(username)
+    user_data = get_user(username)
     
     if not user_data:
         flash("Usuário não encontrado. Faça login novamente.", "error")
@@ -236,20 +374,12 @@ def perfil():
         if nova_senha:
             user_data['senha'] = nova_senha
         
-        users[username] = user_data
-        save_users(users)
+        save_user(username, user_data)
         flash("Perfil atualizado com sucesso! ✨", "success")
         return redirect(url_for('perfil'))
 
-    sorted_users = sorted(users.values(), key=lambda x: x['pontuacao'], reverse=True)
-    user_rank = -1
-    for i, u_data in enumerate(sorted_users):
-        for name, data in users.items():
-            if data == u_data and name == username:
-                user_rank = i + 1
-                break
-        if user_rank != -1:
-            break
+    all_users = get_all_users()
+    user_rank = next((i+1 for i, u in enumerate(all_users) if u['nome'] == username), -1)
 
     achievements = get_achievements()
     user_achievements = {key: achievements[key] for key in user_data.get('achievements', []) if key in achievements}
@@ -268,18 +398,17 @@ def ranking():
     if 'username' not in session:
         return redirect(url_for('login_register'))
         
-    users = load_users()
-    current_user = users.get(session['username'], {})
-    current_turma = current_user.get('turma', '')
+    current_user = get_user(session['username'])
+    current_turma = current_user.get('turma', '') if current_user else ''
     
     filter_type = request.args.get('filter', 'geral')
     
-    user_list = [{'nome': name, **data} for name, data in users.items()]
+    user_list = get_all_users()
     
     if filter_type == 'turma' and current_turma:
         user_list = [user for user in user_list if user.get('turma') == current_turma]
     
-    sorted_users = sorted(user_list, key=lambda x: x['pontuacao'], reverse=True)
+    sorted_users = user_list
     
     return render_template('ranking.html', users=sorted_users, filter_type=filter_type, current_turma=current_turma)
 
@@ -288,23 +417,15 @@ def ver_usuario(username):
     if 'username' not in session:
         return redirect(url_for('login_register'))
     
-    users = load_users()
-    user_data = users.get(username)
+    user_data = get_user(username)
     
     if not user_data:
         flash("Usuário não encontrado! 😅", "error")
         return redirect(url_for('ranking'))
     
     # Calcula ranking
-    sorted_users = sorted(users.values(), key=lambda x: x['pontuacao'], reverse=True)
-    user_rank = -1
-    for i, u_data in enumerate(sorted_users):
-        for name, data in users.items():
-            if data == u_data and name == username:
-                user_rank = i + 1
-                break
-        if user_rank != -1:
-            break
+    all_users = get_all_users()
+    user_rank = next((i+1 for i, u in enumerate(all_users) if u['nome'] == username), -1)
     
     achievements = get_achievements()
     user_achievements = {key: achievements[key] for key in user_data.get('achievements', []) if key in achievements}
@@ -313,9 +434,8 @@ def ver_usuario(username):
 
 @app.route('/live-ranking')
 def live_ranking():
-    users = load_users()
-    user_list = [{'nome': name, **data} for name, data in users.items()]
-    sorted_users = sorted(user_list, key=lambda x: x['pontuacao'], reverse=True)[:100]
+    user_list = get_all_users()[:100]
+    sorted_users = user_list
     return render_template('live_ranking.html', users=sorted_users)
 
 @app.route('/jogar')
@@ -323,8 +443,7 @@ def jogar():
     if 'username' not in session:
         return redirect(url_for('login_register'))
     
-    users = load_users()
-    user_data = users.get(session['username'], {})
+    user_data = get_user(session['username']) or {}
     correct_questions = set(user_data.get('correct_questions', []))
     
     # Se acertou todas, permite repetir
@@ -367,25 +486,16 @@ def responder():
 
     is_correct = (user_answer == question['resposta_correta'])
     
-    users = load_users()
-    user_data = users[session['username']]
+    username = session['username']
+    user_data = get_user(username)
     current_combo = session.get('combo', 0)
     
-    # Adiciona à lista de respondidas
-    answered_questions = user_data.get('answered_questions', [])
-    if question_id not in answered_questions:
-        answered_questions.append(question_id)
-        user_data['answered_questions'] = answered_questions
+    # Adiciona questão respondida
+    add_user_question(username, question_id, is_correct)
     
     new_achievements = []
     
     if is_correct:
-        # Adiciona à lista de acertadas
-        correct_questions = user_data.get('correct_questions', [])
-        if question_id not in correct_questions:
-            correct_questions.append(question_id)
-            user_data['correct_questions'] = correct_questions
-        
         # Aumenta combo
         current_combo += 1
         session['combo'] = current_combo
@@ -419,13 +529,19 @@ def responder():
         # Verifica novos achievements
         new_achievements = check_new_achievements(user_data)
         
+        # Adiciona novos achievements ao banco
+        for achievement in new_achievements:
+            for key, ach_data in get_achievements().items():
+                if ach_data == achievement:
+                    add_user_achievement(username, key)
+                    break
+        
     else:
         # Reset combo
         session['combo'] = 0
         user_data['combo'] = 0
     
-    users[session['username']] = user_data
-    save_users(users)
+    save_user(username, user_data)
     
     session['new_achievements'] = new_achievements
 
@@ -438,6 +554,7 @@ def responder():
                            new_achievements=new_achievements)
 
 if __name__ == '__main__':
-    migrate_users()
+    init_db()
+    migrate_from_json()
     create_teacher_account()
     app.run(host='0.0.0.0', port=5000, debug=False)

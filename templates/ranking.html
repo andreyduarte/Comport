@@ -1,13 +1,119 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Ranking Geral</h1>
-    <ol>
+    <div class="ranking-header" style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🏆</div>
+        <h1>Ranking</h1>
+        <p style="color: #6c757d; font-size: 16px;">Veja quem está dominando a Análise do Comportamento!</p>
+    </div>
+
+    {% if users %}
+        <div class="podium" style="display: flex; justify-content: center; align-items: end; margin-bottom: 30px; height: 120px;">
+            {% for user in users[:3] %}
+                {% set position = loop.index %}
+                <div class="podium-place place-{{ position }}" style="
+                    flex: 1;
+                    margin: 0 5px;
+                    text-align: center;
+                    background: {{ 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' if position == 1 else ('linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%)' if position == 2 else 'linear-gradient(135deg, #cd7f32 0%, #daa520 100%)') }};
+                    border-radius: 12px 12px 0 0;
+                    padding: 15px 10px;
+                    height: {{ '100px' if position == 1 else ('80px' if position == 2 else '60px') }};
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    color: {{ '#333' if position != 3 else 'white' }};
+                    animation: slideUp 0.5s ease-out {{ (position - 1) * 0.2 }}s both;
+                ">
+                    <div style="font-size: {{ '24px' if position == 1 else '20px' }}; margin-bottom: 5px;">
+                        {{ '🥇' if position == 1 else ('🥈' if position == 2 else '🥉') }}
+                    </div>
+                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 3px;">{{ user.nome[:10] }}{{ '...' if user.nome|length > 10 else '' }}</div>
+                    <div style="font-size: 14px; font-weight: bold;">💰 {{ user.pontuacao }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="ranking-list">
         {% for user in users %}
-            <li>
-                <strong>{{ user.nome }}</strong> (Turma: {{ user.turma }}) - {{ user.pontuacao }} pontos
-            </li>
+            {% set position = loop.index %}
+            <div class="ranking-item {{ 'current-user' if user.nome == session.username else '' }}" style="
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                margin: 10px 0;
+                background: {{ 'linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%)' if user.nome == session.username else 'white' }};
+                border: {{ '2px solid #58cc02' if user.nome == session.username else '1px solid #e9ecef' }};
+                border-radius: 12px;
+                animation: slideIn 0.3s ease-out {{ (position - 1) * 0.1 }}s both;
+            ">
+                <div class="position" style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: {{ 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' if position <= 3 else 'linear-gradient(135deg, #6c757d 0%, #495057 100%)' }};
+                    color: {{ '#333' if position <= 3 else 'white' }};
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    margin-right: 15px;
+                    font-size: 16px;
+                ">
+                    {{ position }}
+                </div>
+                
+                <div class="user-info" style="flex: 1;">
+                    <div class="user-name" style="font-weight: bold; font-size: 16px; margin-bottom: 2px;">
+                        {% if user.nome == session.username %}
+                            <span style="color: #333;">{{ user.nome }} <span style="color: #58cc02; font-size: 14px;">(Você)</span></span>
+                        {% else %}
+                            <a href="{{ url_for('ver_usuario', username=user.nome) }}" style="color: #333; text-decoration: none;">{{ user.nome }}</a>
+                        {% endif %}
+                    </div>
+                    <div class="user-class" style="font-size: 14px; color: #6c757d;">{{ user.turma }}</div>
+                </div>
+                
+                <div class="user-score" style="text-align: right;">
+                    <div style="display: flex; align-items: center; font-size: 18px; font-weight: bold; color: #333;">
+                        <span style="margin-right: 5px;">💰</span>
+                        {{ user.pontuacao }}
+                    </div>
+                </div>
+            </div>
         {% else %}
-            <li>Nenhum jogador no ranking ainda.</li>
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #6c757d;">
+                <div style="font-size: 60px; margin-bottom: 15px;">🙋‍♂️</div>
+                <h3>Nenhum jogador ainda!</h3>
+                <p>Seja o primeiro a aparecer no ranking!</p>
+            </div>
         {% endfor %}
-    </ol>
+    </div>
+
+    <style>
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .ranking-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .current-user {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(88, 204, 2, 0.3); }
+            to { box-shadow: 0 0 15px rgba(88, 204, 2, 0.6); }
+        }
+    </style>
 {% endblock %}

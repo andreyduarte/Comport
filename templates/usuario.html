@@ -20,8 +20,28 @@
         </div>
     </div>
 
+    <div class="stats-extra" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+        <div class="stat-card" style="background: linear-gradient(135deg, #58cc02 0%, #4caf50 100%); padding: 15px; border-radius: 12px; text-align: center; color: white;">
+            <div style="font-size: 20px; margin-bottom: 5px;">✅</div>
+            <div style="font-size: 18px; font-weight: bold;">{{ user.get('correct_questions', [])|length }}</div>
+            <div style="font-size: 12px; opacity: 0.9;">Acertos</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); padding: 15px; border-radius: 12px; text-align: center; color: white;">
+            <div style="font-size: 20px; margin-bottom: 5px;">📝</div>
+            <div style="font-size: 18px; font-weight: bold;">{{ user.get('answered_questions', [])|length }}</div>
+            <div style="font-size: 12px; opacity: 0.9;">Respondidas</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%); padding: 15px; border-radius: 12px; text-align: center; color: white;">
+            <div style="font-size: 20px; margin-bottom: 5px;">🔥</div>
+            <div style="font-size: 18px; font-weight: bold;">{{ user.get('combo', 0) }}</div>
+            <div style="font-size: 12px; opacity: 0.9;">Combo</div>
+        </div>
+    </div>
+
     <div class="achievement-section card">
-        <h2 style="margin-bottom: 20px;">🏅 Conquistas</h2>
+        <h2 style="margin-bottom: 20px;">🏅 Conquistas ({{ achievements|length }})</h2>
         
         <div class="achievements" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 15px;">
             {% for key, achievement in achievements.items() %}
@@ -35,33 +55,14 @@
             {% if achievements|length == 0 %}
                 <div style="grid-column: 1 / -1; text-align: center; color: #6c757d; padding: 20px;">
                     <div style="font-size: 40px; margin-bottom: 10px;">🎯</div>
-                    <p>Continue jogando para desbloquear conquistas!</p>
+                    <p>Nenhuma conquista ainda!</p>
                 </div>
             {% endif %}
         </div>
     </div>
 
-    <div class="edit-profile card">
-        <h2 style="margin-bottom: 20px;">⚙️ Editar Perfil</h2>
-        <form action="{{ url_for('perfil') }}" method="post">
-            <label for="turma">Turma:</label>
-            <select name="turma" id="turma" style="width: 100%; padding: 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; margin: 8px 0; background: white;">
-                <option value="{{ user.turma }}" selected>{{ user.turma }}</option>
-                {% if user.turma != 'Manhã' %}<option value="Manhã">Manhã</option>{% endif %}
-                {% if user.turma != 'Noite - Terça' %}<option value="Noite - Terça">Noite - Terça</option>{% endif %}
-                {% if user.turma != 'Noite - Quarta' %}<option value="Noite - Quarta">Noite - Quarta</option>{% endif %}
-                {% if user.turma == 'Professor' %}<option value="Professor">Professor</option>{% endif %}
-            </select>
-            
-            <label for="senha">Nova Senha (opcional):</label>
-            <input type="password" name="senha" id="senha" placeholder="Deixe em branco para manter a atual">
-            
-            <button type="submit" class="btn">Salvar Alterações ✨</button>
-        </form>
-    </div>
-
     <div style="margin-top: 30px; text-align: center;">
-        <a href="{{ url_for('logout') }}" class="btn btn-danger">Sair da Conta 🚪</a>
+        <a href="{{ url_for('ranking') }}" class="btn btn-secondary">← Voltar ao Ranking</a>
     </div>
 
     <style>
@@ -75,12 +76,6 @@
         .achievement.unlocked {
             background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
             border: 2px solid #58cc02;
-        }
-        
-        .achievement.locked {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            opacity: 0.6;
         }
         
         .achievement-icon {
@@ -106,6 +101,10 @@
         
         .stat-card:nth-child(2) {
             animation-delay: 1.5s;
+        }
+        
+        .stat-card:nth-child(3) {
+            animation-delay: 3s;
         }
         
         @keyframes float {

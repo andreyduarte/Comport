@@ -1,7 +1,30 @@
 {
     "andreyduarte": {
         "senha": "aad0308",
-        "turma": "professor",
-        "pontuacao": 20
+        "turma": "Professor",
+        "pontuacao": 193,
+        "combo": 12,
+        "answered_questions": [
+            11,
+            36,
+            4,
+            71,
+            99,
+            6
+        ],
+        "correct_questions": [
+            11,
+            36,
+            4,
+            71,
+            99,
+            6
+        ],
+        "rank": 999,
+        "achievements": [
+            "expert",
+            "primeiro_passo",
+            "estudioso"
+        ]
     }
 }

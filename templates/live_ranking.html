@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Ao Vivo - PsicoQuiz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 32px;
+            opacity: 0.9;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .ranking-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            flex: 1;
+            align-content: start;
+        }
+        
+        .rank-item {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .rank-item:nth-child(1) {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            border: 3px solid #ffa500;
+            transform: scale(1.1);
+        }
+        
+        .rank-item:nth-child(2) {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #333;
+            border: 3px solid #999;
+        }
+        
+        .rank-item:nth-child(3) {
+            background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+            color: white;
+            border: 3px solid #b8860b;
+        }
+        
+        .position {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .medal {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .class {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .refresh-indicator {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .rank-item:nth-child(1) {
+            animation: fadeInUp 0.8s ease-out, pulse 2s infinite;
+        }
+    </style>
+    <script>
+        setTimeout(() => location.reload(), 15000);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🏆 RANKING AO VIVO</div>
+            <div class="subtitle">PsicoQuiz - Análise do Comportamento</div>
+        </div>
+        
+        <div class="ranking-grid">
+            {% for user in users[:20] %}
+                <div class="rank-item" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                    {% if loop.index <= 3 %}
+                        <div class="medal">
+                            {{ '🥇' if loop.index == 1 else ('🥈' if loop.index == 2 else '🥉') }}
+                        </div>
+                    {% else %}
+                        <div class="position">{{ loop.index }}</div>
+                    {% endif %}
+                    
+                    <div class="avatar">
+                        👤
+                    </div>
+                    
+                    <div class="name">{{ user.nome[:12] }}{{ '...' if user.nome|length > 12 else '' }}</div>
+                    <div class="class">{{ user.turma }}</div>
+                    <div class="score">
+                        <span>💰</span>
+                        <span>{{ user.pontuacao }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="refresh-indicator">
+            <span>🔄</span>
+            <span>Atualiza a cada 15s</span>
+        </div>
+    </div>
+</body>
+</html>

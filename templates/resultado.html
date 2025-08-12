@@ -1,15 +1,129 @@
 {% extends "base.html" %}
 {% block content %}
     {% if is_correct %}
-        <h1 style="color: green;">Parabéns, você acertou!</h1>
-        <p><strong>Reforço Positivo:</strong> +10 pontos foram adicionados à sua pontuação!</p>
+        <div class="result-container correct" style="text-align: center;">
+            <div class="result-icon" style="font-size: 80px; margin-bottom: 20px; animation: bounce 1s;">🎉</div>
+            <h1 style="color: #28a745; font-size: 28px; margin-bottom: 15px;">Parabéns!</h1>
+            <p style="font-size: 18px; color: #495057; margin-bottom: 20px;">Você acertou!</p>
+            
+            <div class="coin-reward" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 20px; border-radius: 16px; margin: 20px 0; animation: coinFlip 1s ease-in-out;">
+                <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
+                <p style="font-size: 20px; font-weight: bold; color: #333; margin: 0;">+{{ session.get('coins_earned', 10) }} Moedas!</p>
+                {% if session.get('combo_bonus', 0) > 0 %}
+                    <p style="font-size: 14px; color: #666; margin: 5px 0 0 0;">Bônus Combo: +{{ session.get('combo_bonus', 0)|int }}%</p>
+                {% endif %}
+            </div>
+            
+            {% if session.get('combo', 0) > 1 %}
+                <div class="combo-display" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%); padding: 15px; border-radius: 12px; margin: 15px 0; text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 5px;">🔥</div>
+                    <p style="color: white; font-weight: bold; margin: 0;">Combo: {{ session.get('combo', 0) }}x</p>
+                    {% if session.get('time_bonus', 0) > 0 %}
+                        <p style="color: white; font-size: 12px; margin: 5px 0 0 0;">Bônus Tempo: +{{ session.get('time_bonus', 0) }}%</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            {% if new_achievements %}
+                {% for achievement in new_achievements %}
+                    <div class="achievement-unlock" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 20px; border-radius: 16px; margin: 20px 0; text-align: center; animation: achievementPop 1s ease-out;">
+                        <div style="font-size: 50px; margin-bottom: 10px;">{{ achievement.icon | e }}</div>
+                        <h3 style="color: #333; margin: 10px 0 5px 0; font-size: 18px;">Conquista Desbloqueada!</h3>
+                        <p style="color: #333; font-weight: bold; margin: 0; font-size: 16px;">{{ achievement.name | e }}</p>
+                        <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">{{ achievement.desc | e }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="motivational-message" style="background: #e8f5e8; padding: 15px; border-radius: 12px; margin: 20px 0;">
+                <p style="color: #28a745; font-weight: 500; margin: 0;">💪 Continue assim! Você está dominando a Análise do Comportamento!</p>
+            </div>
+        </div>
     {% else %}
-        <h1 style="color: red;">Resposta Incorreta!</h1>
-        <p>A resposta correta para a pergunta <em>"{{ question.pergunta }}"</em> era:</p>
-        <p><strong>{{ correct_answer }}</strong></p>
-        <p>Não desanime! O erro faz parte do aprendizado. 😉</p>
+        <div class="result-container incorrect" style="text-align: center;">
+            <div class="result-icon" style="font-size: 80px; margin-bottom: 20px; animation: shake 0.5s;">🤔</div>
+            <h1 style="color: #dc3545; font-size: 24px; margin-bottom: 15px;">Ops! Não foi dessa vez</h1>
+            
+            <div class="correct-answer-card" style="background: #fff3cd; border: 2px solid #ffeaa7; border-radius: 16px; padding: 20px; margin: 20px 0; text-align: left;">
+                <h3 style="color: #856404; margin-bottom: 15px; font-size: 16px;">💡 A resposta correta era:</h3>
+                <p style="color: #333; font-size: 16px; font-weight: 500; line-height: 1.4; margin: 0;">{{ correct_answer | e }}</p>
+            </div>
+            
+            <div class="motivational-message" style="background: #e3f2fd; padding: 15px; border-radius: 12px; margin: 20px 0;">
+                <p style="color: #1976d2; font-weight: 500; margin: 0;">🌱 Não desanime! Cada erro é uma oportunidade de aprender!</p>
+            </div>
+        </div>
     {% endif %}
     
-    <br>
-    <a href="{{ url_for('jogar') }}" class="btn">Próxima Pergunta &rarr;</a>
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{{ url_for('jogar') }}" class="btn" style="font-size: 18px; padding: 18px; text-decoration: none;">
+            Próxima Questão 🚀
+        </a>
+    </div>
+
+    <style>
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            80% { transform: translateY(-10px); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes coinFlip {
+            0% { transform: rotateY(0deg) scale(0.8); }
+            50% { transform: rotateY(180deg) scale(1.1); }
+            100% { transform: rotateY(360deg) scale(1); }
+        }
+        
+        .result-container {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes achievementPop {
+            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+    </style>
+
+    <script>
+        // Atualiza os contadores no header
+        {% if is_correct %}
+            setTimeout(() => {
+                const coinCount = document.getElementById('coin-count');
+                const comboCount = document.getElementById('combo-count');
+                if (coinCount) {
+                    coinCount.textContent = {{ session.get('pontuacao', 0) }};
+                    coinCount.style.animation = 'pulse 0.5s';
+                }
+                if (comboCount) {
+                    comboCount.textContent = {{ session.get('combo', 0) }};
+                    comboCount.style.animation = 'pulse 0.5s';
+                }
+            }, 1000);
+        {% else %}
+            setTimeout(() => {
+                const comboCount = document.getElementById('combo-count');
+                if (comboCount) {
+                    comboCount.textContent = '0';
+                }
+            }, 1000);
+        {% endif %}
+    </script>
 {% endblock %}

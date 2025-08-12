@@ -1,18 +1,114 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Pergunta!</h1>
-    <h2>{{ question.pergunta }}</h2>
+    <div class="question-header" style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🤔</div>
+    </div>
 
-    <form action="{{ url_for('responder') }}" method="post">
-        <input type="hidden" name="question_id" value="{{ question.id }}">
+    <div class="card">
+        <h2 style="font-size: 18px; line-height: 1.4; margin-bottom: 25px;">{{ question.pergunta }}</h2>
+
+        <form action="{{ url_for('responder') }}" method="post" id="quiz-form">
+            <input type="hidden" name="question_id" value="{{ question.id }}">
+            
+            <div class="options-container">
+                {% for key, value in question.opcoes_randomizadas %}
+                    <div class="option-card" onclick="selectOption('{{ key }}')">
+                        <input type="radio" id="opcao_{{ key }}" name="opcao" value="{{ key }}" required style="display: none;">
+                        <label for="opcao_{{ key }}" style="cursor: pointer; display: flex; align-items: flex-start; width: 100%;">
+                            <span class="option-letter">{{ key.upper() }}</span>
+                            <span class="option-text">{{ value }}</span>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="btn" id="submit-btn" disabled style="opacity: 0.5; margin-top: 25px;">
+                Confirmar Resposta 🎯
+            </button>
+        </form>
+    </div>
+
+    <style>
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
         
-        {% for key, value in question.opcoes.items() %}
-            <p>
-                <input type="radio" id="opcao_{{ key }}" name="opcao" value="{{ key }}" required>
-                <label for="opcao_{{ key }}">{{ value }}</label>
-            </p>
-        {% endfor %}
+        .option-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            display: flex;
+            align-items: flex-start;
+        }
         
-        <button type="submit" class="btn">Responder</button>
-    </form>
+        .option-card:hover {
+            border-color: #58cc02;
+            background: #f0fff0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
+        }
+        
+        .option-card.selected {
+            border-color: #58cc02;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+            box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+        }
+        
+        .option-letter {
+            background: #58cc02;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .option-card.selected .option-letter {
+            background: #4caf50;
+            animation: pulse 0.5s;
+        }
+        
+        .option-text {
+            font-size: 16px;
+            line-height: 1.4;
+            flex: 1;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+
+    <script>
+        function selectOption(key) {
+            // Remove seleção anterior
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adiciona seleção atual
+            event.currentTarget.classList.add('selected');
+            
+            // Marca o radio button
+            document.getElementById('opcao_' + key).checked = true;
+            
+            // Habilita o botão
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+        }
+    </script>
 {% endblock %}

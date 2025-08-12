@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  psicoquiz:
+    build: .
+    container_name: psicoquiz
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./users.json:/app/users.json
+    environment:
+      - FLASK_ENV=production
+    networks:
+      - quiz-network
+
+networks:
+  quiz-network:
+    driver: bridge

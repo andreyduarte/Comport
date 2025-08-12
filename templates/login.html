@@ -1,35 +1,67 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Bem-vindo ao Quiz de Análise do Comportamento!</h1>
-    <p>Faça seu cadastro para começar a jogar ou entre com seus dados.</p>
-
-    <div style="display: flex; justify-content: space-around;">
-        
-        <!-- Formulário de Cadastro -->
-        <form action="/" method="post" style="width: 45%;">
-            <h2>Cadastre-se</h2>
-            <label for="reg_nome">Nome:</label><br>
-            <input type="text" id="reg_nome" name="nome" required><br><br>
-            
-            <label for="turma">Turma:</label><br>
-            <input type="text" id="turma" name="turma" required><br><br>
-            
-            <label for="reg_senha">Senha:</label><br>
-            <input type="password" id="reg_senha" name="senha" required><br><br>
-            
-            <button type="submit" name="action" value="register" class="btn">Cadastrar e Jogar</button>
-        </form>
-
-        <!-- Formulário de Login -->
-        <form action="/" method="post" style="width: 45%;">
-            <h2>Login</h2>
-            <label for="login_nome">Nome:</label><br>
-            <input type="text" id="login_nome" name="nome" required><br><br>
-            
-            <label for="login_senha">Senha:</label><br>
-            <input type="password" id="login_senha" name="senha" required><br><br>
-
-            <button type="submit" name="action" value="login" class="btn">Entrar</button>
-        </form>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <div style="font-size: 60px; margin-bottom: 10px;">🧠</div>
+        <h1>PsicoQuiz</h1>
+        <p style="color: #6c757d; font-size: 16px;">Aprenda Análise do Comportamento de forma divertida!</p>
     </div>
+
+    <div id="login-form" class="card">
+        <h2 style="text-align: center; margin-bottom: 20px;">🔑 Entrar</h2>
+        <form action="/" method="post">
+            <label for="login_nome">Nome:</label>
+            <input type="text" id="login_nome" name="nome" required placeholder="Digite seu nome">
+            
+            <label for="login_senha">Senha:</label>
+            <input type="password" id="login_senha" name="senha" required placeholder="Digite sua senha">
+
+            <button type="submit" name="action" value="login" class="btn">Entrar e Jogar! 🎯</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #6c757d;">Não tem conta?</p>
+            <button onclick="toggleForms()" class="btn btn-secondary">Criar Conta 🎆</button>
+        </div>
+    </div>
+
+    <div id="register-form" class="card" style="display: none;">
+        <h2 style="text-align: center; margin-bottom: 20px;">🎆 Criar Conta</h2>
+        <form action="/" method="post">
+            <label for="reg_nome">Nome:</label>
+            <input type="text" id="reg_nome" name="nome" required placeholder="Seu nome completo">
+            
+            <label for="turma">Turma:</label>
+            <select id="turma" name="turma" required style="width: 100%; padding: 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; margin: 8px 0; background: white;">
+                <option value="">Selecione sua turma</option>
+                <option value="Manhã">Manhã</option>
+                <option value="Noite - Terça">Noite - Terça</option>
+                <option value="Noite - Quarta">Noite - Quarta</option>
+            </select>
+            
+            <label for="reg_senha">Senha:</label>
+            <input type="password" id="reg_senha" name="senha" required placeholder="Crie uma senha">
+            
+            <button type="submit" name="action" value="register" class="btn">Cadastrar e Começar! 🚀</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #6c757d;">Já tem conta?</p>
+            <button onclick="toggleForms()" class="btn btn-secondary">Fazer Login 🔑</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+        }
+    </script>
 {% endblock %}

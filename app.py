@@ -53,13 +53,10 @@ def init_db():
         )
     ''')
     
-        conn.commit()
-        conn.close()
-        print("Tabelas criadas com sucesso!")
-        return True
-    except psycopg2.Error as e:
-        print(f"Erro ao criar tabelas: {e}")
-        return False
+    conn.commit()
+    conn.close()
+    print("Tabelas criadas com sucesso!")
+    return True
 
 def migrate_from_json():
     """Migra dados do JSON para PostgreSQL"""

@@ -6,6 +6,26 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
 
+def migrate_users():
+    """Migra usuários existentes para nova estrutura"""
+    users = load_users()
+    updated = False
+    
+    for username, user_data in users.items():
+        if 'max_combo' not in user_data:
+            user_data['max_combo'] = user_data.get('combo', 0)
+            updated = True
+        if 'answered_questions' not in user_data:
+            user_data['answered_questions'] = []
+            updated = True
+        if 'achievements' not in user_data:
+            user_data['achievements'] = []
+            updated = True
+    
+    if updated:
+        save_users(users)
+        print("Usuários migrados com sucesso!")
+
 def create_teacher_account():
     """Cria conta de professor se não existir"""
     teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
@@ -200,6 +220,11 @@ def perfil():
     users = load_users()
     username = session['username']
     user_data = users.get(username)
+    
+    if not user_data:
+        flash("Usuário não encontrado. Faça login novamente.", "error")
+        session.clear()
+        return redirect(url_for('login_register'))
     
     # Atualiza a pontuação e combo na sessão
     session['pontuacao'] = user_data['pontuacao']
@@ -413,5 +438,6 @@ def responder():
                            new_achievements=new_achievements)
 
 if __name__ == '__main__':
+    migrate_users()
     create_teacher_account()
     app.run(host='0.0.0.0', port=5000, debug=False)

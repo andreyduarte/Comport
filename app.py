@@ -4,12 +4,15 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
+# Caminho absoluto para o banco
+DB_PATH = os.path.join(os.getcwd(), 'quiz.db')
+
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
 
 def init_db():
     """Inicializa o banco de dados"""
-    conn = sqlite3.connect('quiz.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -52,8 +55,12 @@ def migrate_from_json():
         with open('users.json', 'r', encoding='utf-8') as f:
             users_data = json.load(f)
         
-        conn = sqlite3.connect('quiz.db')
-        cursor = conn.cursor()
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+        except sqlite3.OperationalError as e:
+            print(f"Erro na migração: {e}")
+            return
         
         for username, data in users_data.items():
             cursor.execute('''
@@ -207,97 +214,113 @@ def check_new_achievements(user_data, rank=999):
 
 def get_user(username):
     """Busca um usuário no banco"""
-    conn = sqlite3.connect('quiz.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
-    user_row = cursor.fetchone()
-    
-    if not user_row:
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+        user_row = cursor.fetchone()
+        
+        if not user_row:
+            conn.close()
+            return None
+        
+        # Busca questões respondidas
+        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = ?', (username,))
+        questions = cursor.fetchall()
+        
+        # Busca achievements
+        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = ?', (username,))
+        achievements = [row[0] for row in cursor.fetchall()]
+        
         conn.close()
+        
+        return {
+            'senha': user_row[1],
+            'turma': user_row[2],
+            'pontuacao': user_row[3],
+            'combo': user_row[4],
+            'max_combo': user_row[5],
+            'is_teacher': bool(user_row[6]),
+            'answered_questions': [q[0] for q in questions],
+            'correct_questions': [q[0] for q in questions if q[1]],
+            'achievements': achievements
+        }
+    except sqlite3.OperationalError as e:
+        print(f"Erro SQLite: {e}")
         return None
-    
-    # Busca questões respondidas
-    cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = ?', (username,))
-    questions = cursor.fetchall()
-    
-    # Busca achievements
-    cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = ?', (username,))
-    achievements = [row[0] for row in cursor.fetchall()]
-    
-    conn.close()
-    
-    return {
-        'senha': user_row[1],
-        'turma': user_row[2],
-        'pontuacao': user_row[3],
-        'combo': user_row[4],
-        'max_combo': user_row[5],
-        'is_teacher': bool(user_row[6]),
-        'answered_questions': [q[0] for q in questions],
-        'correct_questions': [q[0] for q in questions if q[1]],
-        'achievements': achievements
-    }
 
 def save_user(username, user_data):
     """Salva um usuário no banco"""
-    conn = sqlite3.connect('quiz.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        INSERT OR REPLACE INTO users 
-        (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        username,
-        user_data.get('senha', ''),
-        user_data.get('turma', ''),
-        user_data.get('pontuacao', 0),
-        user_data.get('combo', 0),
-        user_data.get('max_combo', 0),
-        user_data.get('is_teacher', False)
-    ))
-    
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT OR REPLACE INTO users 
+            (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            username,
+            user_data.get('senha', ''),
+            user_data.get('turma', ''),
+            user_data.get('pontuacao', 0),
+            user_data.get('combo', 0),
+            user_data.get('max_combo', 0),
+            user_data.get('is_teacher', False)
+        ))
+        
+        conn.commit()
+        conn.close()
+    except sqlite3.OperationalError as e:
+        print(f"Erro ao salvar usuário: {e}")
 
 def get_all_users():
     """Busca todos os usuários"""
-    conn = sqlite3.connect('quiz.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT username, turma, pontuacao FROM users ORDER BY pontuacao DESC')
-    users = cursor.fetchall()
-    
-    conn.close()
-    
-    return [{'nome': u[0], 'turma': u[1], 'pontuacao': u[2]} for u in users]
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT username, turma, pontuacao FROM users ORDER BY pontuacao DESC')
+        users = cursor.fetchall()
+        
+        conn.close()
+        
+        return [{'nome': u[0], 'turma': u[1], 'pontuacao': u[2]} for u in users]
+    except sqlite3.OperationalError:
+        return []
 
 def add_user_question(username, question_id, is_correct):
     """Adiciona uma questão respondida"""
-    conn = sqlite3.connect('quiz.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        INSERT OR IGNORE INTO user_questions 
-        (username, question_id, is_correct) VALUES (?, ?, ?)
-    ''', (username, question_id, is_correct))
-    
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT OR IGNORE INTO user_questions 
+            (username, question_id, is_correct) VALUES (?, ?, ?)
+        ''', (username, question_id, is_correct))
+        
+        conn.commit()
+        conn.close()
+    except sqlite3.OperationalError as e:
+        print(f"Erro ao adicionar questão: {e}")
 
 def add_user_achievement(username, achievement_key):
     """Adiciona um achievement"""
-    conn = sqlite3.connect('quiz.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        INSERT OR IGNORE INTO user_achievements 
-        (username, achievement_key) VALUES (?, ?)
-    ''', (username, achievement_key))
-    
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT OR IGNORE INTO user_achievements 
+            (username, achievement_key) VALUES (?, ?)
+        ''', (username, achievement_key))
+        
+        conn.commit()
+        conn.close()
+    except sqlite3.OperationalError as e:
+        print(f"Erro ao adicionar achievement: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def login_register():

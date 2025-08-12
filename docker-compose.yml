@@ -8,7 +8,6 @@ services:
     ports:
       - "5001:5000"
     volumes:
-      - ./users.json:/app/users.json
       - ./quiz.db:/app/quiz.db
     env_file:
       - .env

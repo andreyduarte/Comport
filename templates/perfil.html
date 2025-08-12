@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Perfil de {{ username }}</h1>
+    
+    <h2>Sua Pontuação</h2>
+    <p><strong>Pontos:</strong> {{ user.pontuacao }}</p>
+    <p><strong>Posição no Ranking:</strong> {{ rank }}º</p>
+    <p><strong>Turma:</strong> {{ user.turma }}</p>
+
+    <hr>
+
+    <h2>Editar Perfil</h2>
+    <form action="{{ url_for('perfil') }}" method="post">
+        <label for="turma">Mudar Turma:</label><br>
+        <input type="text" name="turma" id="turma" value="{{ user.turma }}"><br><br>
+
+        <label for="senha">Nova Senha (deixe em branco para não alterar):</label><br>
+        <input type="password" name="senha" id="senha"><br><br>
+        
+        <button type="submit" class="btn">Salvar Alterações</button>
+    </form>
+{% endblock %}

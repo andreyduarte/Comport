@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Pergunta!</h1>
+    <h2>{{ question.pergunta }}</h2>
+
+    <form action="{{ url_for('responder') }}" method="post">
+        <input type="hidden" name="question_id" value="{{ question.id }}">
+        
+        {% for key, value in question.opcoes.items() %}
+            <p>
+                <input type="radio" id="opcao_{{ key }}" name="opcao" value="{{ key }}" required>
+                <label for="opcao_{{ key }}">{{ value }}</label>
+            </p>
+        {% endfor %}
+        
+        <button type="submit" class="btn">Responder</button>
+    </form>
+{% endblock %}

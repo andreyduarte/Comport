@@ -1,0 +1,1002 @@
+[
+  {
+    "pergunta": "Quem foi o fisiologista russo-soviético que primeiro observou e descreveu a aquisição de novos reflexos em laboratório?",
+    "opcoes": {
+      "a": "B. F. Skinner",
+      "b": "John B. Watson",
+      "c": "Ivan Petrovich Pavlov",
+      "d": "Andrey A. Duarte"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A descoberta do reflexo aprendido (ou condicionado) ocorreu durante estudos sobre qual reflexo inato em cães?",
+    "opcoes": {
+      "a": "O reflexo patelar (chute)",
+      "b": "O reflexo de piscar",
+      "c": "O reflexo de salivação",
+      "d": "O reflexo de sucção"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "No experimento clássico de Pavlov, a comida era um:",
+    "opcoes": {
+      "a": "Estímulo Neutro (NS)",
+      "b": "Estímulo Condicionado (CS)",
+      "c": "Estímulo Incondicionado (US)",
+      "d": "Resposta Incondicionada (UR)"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A salivação que ocorria naturalmente na presença da comida é chamada de:",
+    "opcoes": {
+      "a": "Resposta Condicionada (CR)",
+      "b": "Resposta Incondicionada (UR)",
+      "c": "Resposta Neutra (RN)",
+      "d": "Estímulo Incondicionado (US)"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Antes de ser associado à comida, o som do sino era um:",
+    "opcoes": {
+      "a": "Estímulo Condicionado (CS)",
+      "b": "Estímulo Incondicionado (US)",
+      "c": "Estímulo Neutro (NS)",
+      "d": "Estímulo Aversivo"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Após o emparelhamento repetido com a comida, o som do sino tornou-se um:",
+    "opcoes": {
+      "a": "Estímulo Condicionado (CS)",
+      "b": "Estímulo Incondicionado (US)",
+      "c": "Estímulo Neutro (NS)",
+      "d": "Resposta Condicionada (CR)"
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "A salivação eliciada apenas pelo som do sino, após o condicionamento, é uma:",
+    "opcoes": {
+      "a": "Resposta Incondicionada (UR)",
+      "b": "Resposta Condicionada (CR)",
+      "c": "Resposta Neutra (RN)",
+      "d": "Resposta Voluntária"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'Ontogênese'?",
+    "opcoes": {
+      "a": "A história evolutiva da espécie.",
+      "b": "O estudo dos genes de um organismo.",
+      "c": "O histórico de vida e formação de um único organismo.",
+      "d": "O estudo dos reflexos inatos."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Um Estímulo Incondicionado (US) elicia uma resposta que faz parte da:",
+    "opcoes": {
+      "a": "Ontogênese",
+      "b": "Filogênese",
+      "c": "Aprendizagem social",
+      "d": "Memória de curto prazo"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Um Estímulo Condicionado (CS) elicia uma resposta que é parte da:",
+    "opcoes": {
+      "a": "Ontogênese",
+      "b": "Filogênese",
+      "c": "Genética",
+      "d": "Herança biológica"
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "O processo de apresentar repetidamente um Estímulo Neutro (NS) junto com um Estímulo Incondicionado (US) é chamado de:",
+    "opcoes": {
+      "a": "Generalização",
+      "b": "Extinção",
+      "c": "Emparelhamento",
+      "d": "Habituação"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Quem foi o psicólogo behaviorista que realizou o controverso experimento com o 'Pequeno Albert'?",
+    "opcoes": {
+      "a": "Ivan Pavlov",
+      "b": "Andrey A. Duarte",
+      "c": "B. F. Skinner",
+      "d": "John B. Watson"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Qual era o objetivo principal do experimento do 'Pequeno Albert'?",
+    "opcoes": {
+      "a": "Curar a fobia de Albert a animais.",
+      "b": "Provar que as emoções são puramente genéticas.",
+      "c": "Demonstrar que uma emoção, como o medo, pode ser condicionada.",
+      "d": "Estudar o desenvolvimento da linguagem em bebês."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "No experimento com 'Pequeno Albert', o barulho alto e repentino funcionou como:",
+    "opcoes": {
+      "a": "Estímulo Condicionado (CS)",
+      "b": "Estímulo Incondicionado (US)",
+      "c": "Estímulo Neutro (NS)",
+      "d": "Resposta Condicionada (CR)"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Inicialmente, o rato branco para o 'Pequeno Albert' era um:",
+    "opcoes": {
+      "a": "Estímulo Condicionado (CS)",
+      "b": "Estímulo Incondicionado (US)",
+      "c": "Estímulo Neutro (NS)",
+      "d": "Estímulo Aversivo Inato"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Uma pessoa que sofre um assalto (US) e passa a sentir medo (CR) ao ouvir o som de uma moto (CS) parecida com a do assaltante, vivenciou um processo de:",
+    "opcoes": {
+      "a": "Habituação",
+      "b": "Condicionamento Pavloviano",
+      "c": "Potenciação",
+      "d": "Comportamento Operante"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'Generalização Respondente'?",
+    "opcoes": {
+      "a": "O processo de esquecer uma resposta condicionada.",
+      "b": "A tendência de responder da mesma forma a estímulos que são semelhantes ao Estímulo Condicionado original.",
+      "c": "A capacidade de diferenciar estímulos muito parecidos.",
+      "d": "O fortalecimento de uma resposta através da repetição."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Após aprender a ter medo de um rato branco, o 'Pequeno Albert' também demonstrou medo de uma barba de Papai Noel. Isso é um exemplo de:",
+    "opcoes": {
+      "a": "Extinção",
+      "b": "Contracondicionamento",
+      "c": "Generalização Respondente",
+      "d": "Recuperação Espontânea"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O 'Gradiente de Generalização' sugere que:",
+    "opcoes": {
+      "a": "Quanto mais diferente um estímulo for do CS original, mais forte será a resposta.",
+      "b": "A generalização só ocorre com estímulos idênticos.",
+      "c": "Quanto mais semelhante um estímulo for do CS original, mais forte será a magnitude da resposta eliciada.",
+      "d": "A generalização é um processo de tudo ou nada."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A capacidade de identificar rostos em objetos inanimados (pareidolia) pode ser explicada pelo mecanismo de:",
+    "opcoes": {
+      "a": "Extinção Respondente",
+      "b": "Contracondicionamento",
+      "c": "Generalização Respondente",
+      "d": "Condicionamento de Ordem Superior"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O que é 'Extinção Respondente'?",
+    "opcoes": {
+      "a": "O fortalecimento de uma resposta condicionada.",
+      "b": "A reaparição de uma resposta após um tempo.",
+      "c": "O enfraquecimento e desaparecimento de uma resposta condicionada pela apresentação do CS sem o US.",
+      "d": "A generalização da resposta para outros estímulos."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Para extinguir o medo condicionado de Albert ao rato branco, qual procedimento deveria ser aplicado?",
+    "opcoes": {
+      "a": "Mostrar o rato e fazer o barulho alto ao mesmo tempo.",
+      "b": "Mostrar repetidamente o rato branco a Albert sem o barulho alto.",
+      "c": "Mostrar apenas outros animais peludos.",
+      "d": "Explicar verbalmente para Albert que o rato não é perigoso."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'Recuperação Espontânea'?",
+    "opcoes": {
+      "a": "A recuperação da memória de um evento traumático.",
+      "b": "O reaparição de uma resposta condicionada extinta após um período de descanso.",
+      "c": "A cura de uma fobia sem tratamento.",
+      "d": "A generalização para um novo estímulo."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Quando uma resposta condicionada retorna via recuperação espontânea, sua magnitude geralmente é:",
+    "opcoes": {
+      "a": "Mais forte do que era antes da extinção.",
+      "b": "Exatamente igual à de antes da extinção.",
+      "c": "Menor do que era antes da extinção.",
+      "d": "Imprevisível."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O que é 'Contracondicionamento'?",
+    "opcoes": {
+      "a": "O mesmo que extinção.",
+      "b": "A punição de uma resposta emocional.",
+      "c": "O condicionamento de uma resposta nova e incompatível com uma resposta condicionada já existente.",
+      "d": "Ignorar o estímulo condicionado."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Para tratar o medo de uma criança a 'bichinhos' (CS), um terapeuta emparelha a visão dos bichinhos com a presença da mãe (US), que elicia segurança (UR). O objetivo é que os bichinhos passem a eliciar segurança (CR). Este procedimento é um exemplo de:",
+    "opcoes": {
+      "a": "Extinção",
+      "b": "Generalização",
+      "c": "Recuperação Espontânea",
+      "d": "Contracondicionamento"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "O que é 'Dessensibilização Sistemática'?",
+    "opcoes": {
+      "a": "Um procedimento que consiste em dividir o processo de extinção em pequenos passos, começando com estímulos menos aversivos.",
+      "b": "Uma técnica que usa medicação para eliminar fobias.",
+      "c": "Expor o indivíduo diretamente e de uma só vez ao estímulo mais temido.",
+      "d": "O mesmo que contracondicionamento."
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "A dessensibilização sistemática é uma intervenção que se baseia principalmente no princípio de:",
+    "opcoes": {
+      "a": "Recuperação Espontânea",
+      "b": "Gradiente de Generalização",
+      "c": "Potenciação",
+      "d": "Lei da Latência"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "No condicionamento de segunda ordem, um Estímulo Neutro é emparelhado com:",
+    "opcoes": {
+      "a": "Uma Resposta Incondicionada (UR)",
+      "b": "Um Estímulo Incondicionado (US)",
+      "c": "Um Estímulo Condicionado (CS) já estabelecido",
+      "d": "Uma Resposta Condicionada (CR)"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O fato de sentirmos o cheiro de um perfume (CS) que uma pessoa especial usava (US) e isso nos eliciar uma sensação de alegria (CR) é um exemplo de:",
+    "opcoes": {
+      "a": "Reflexo inato",
+      "b": "Reflexo aprendido",
+      "c": "Habituação",
+      "d": "Comportamento operante"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Qual é a principal utilidade do condicionamento pavloviano para a psicologia, segundo o material?",
+    "opcoes": {
+      "a": "Treinar animais de circo.",
+      "b": "Entender e intervir sobre reflexos emocionais, como medos e fobias.",
+      "c": "Aumentar a produtividade em fábricas.",
+      "d": "Desenvolver novos medicamentos."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Na fórmula do condicionamento, a relação 'Estímulo Incondicionado (US) → Resposta Incondicionada (UR)' representa o:",
+    "opcoes": {
+      "a": "Reflexo Condicionado",
+      "b": "Emparelhamento",
+      "c": "Reflexo Inato",
+      "d": "Extinção"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A sequência 'Sino (S) ↔ Comida (S)' na fórmula do condicionamento representa o processo de:",
+    "opcoes": {
+      "a": "Extinção",
+      "b": "Generalização",
+      "c": "Reflexo Inato",
+      "d": "Emparelhamento"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "A relação 'Sino (S) → Salivação (R)', após o treino, representa o:",
+    "opcoes": {
+      "a": "Reflexo Condicionado",
+      "b": "Reflexo Inato",
+      "c": "Generalização",
+      "d": "Emparelhamento"
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "Um Estímulo Condicionado (CS) é um estímulo que:",
+    "opcoes": {
+      "a": "Naturalmente elicia uma resposta.",
+      "b": "Não elicia nenhuma resposta.",
+      "c": "Passa a eliciar uma resposta após emparelhamento com um US.",
+      "d": "É sempre de natureza aversiva."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Uma Resposta Condicionada (CR) é:",
+    "opcoes": {
+      "a": "Uma resposta natural a um estímulo, parte da filogênese.",
+      "b": "Uma resposta eliciada por um Estímulo Condicionado.",
+      "c": "Uma resposta que não pode ser extinta.",
+      "d": "Sempre uma resposta de medo ou ansiedade."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A principal diferença entre Estímulo Neutro (NS) e Estímulo Condicionado (CS) é que:",
+    "opcoes": {
+      "a": "O NS elicia a resposta incondicionada, e o CS elicia a resposta condicionada.",
+      "b": "O NS não elicia a resposta em questão antes do treino, enquanto o CS a elicia após o treino.",
+      "c": "Não há diferença, são sinônimos.",
+      "d": "O NS é sempre auditivo e o CS é sempre visual."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Por que a ética em pesquisa é um tema crucial ao se discutir o experimento do 'Pequeno Albert'?",
+    "opcoes": {
+      "a": "Porque o rato utilizado no experimento sofreu.",
+      "b": "Porque o experimento não teve resultados conclusivos.",
+      "c": "Porque foi eticamente questionável causar um trauma (medo) em uma criança para fins de pesquisa, sem um plano para reverter o dano.",
+      "d": "Porque os pais de Albert não autorizaram a publicação dos resultados."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Se uma pessoa tem medo de dentista por causa de uma experiência dolorosa, e o som da 'broquinha' se torna um CS para o medo, ouvir um som parecido, como o de um liquidificador, e sentir um leve desconforto é um exemplo de:",
+    "opcoes": {
+      "a": "Extinção",
+      "b": "Generalização",
+      "c": "Contracondicionamento",
+      "d": "Recuperação Espontânea"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Voltar ao consultório do dentista várias vezes para procedimentos indolores, como limpezas, pode diminuir o medo condicionado ao som da broquinha. Este processo é um exemplo de:",
+    "opcoes": {
+      "a": "Generalização",
+      "b": "Recuperação Espontânea",
+      "c": "Extinção",
+      "d": "Contracondicionamento"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Após um longo período sem ir ao dentista, o medo da pessoa da questão anterior volta com menor intensidade na consulta seguinte. Isso ilustra:",
+    "opcoes": {
+      "a": "Recuperação Espontânea",
+      "b": "Generalização",
+      "c": "Extinção completa",
+      "d": "Contracondicionamento"
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "O que acontece com a 'chance de novas recuperações espontâneas' e a 'magnitude' da resposta a cada novo ciclo de extinção?",
+    "opcoes": {
+      "a": "Ambas aumentam.",
+      "b": "Ambas diminuem.",
+      "c": "A chance aumenta, mas a magnitude diminui.",
+      "d": "A chance diminui, mas a magnitude aumenta."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O condicionamento pavloviano explica como aprendemos a reagir a estímulos que, antes, eram:",
+    "opcoes": {
+      "a": "Incondicionados",
+      "b": "Aversivos",
+      "c": "Reforçadores",
+      "d": "Neutros"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Uma característica essencial de um Estímulo Incondicionado (US) é que ele elicia uma resposta:",
+    "opcoes": {
+      "a": "Após repetidos emparelhamentos.",
+      "b": "Naturalmente, sem necessidade de aprendizagem prévia.",
+      "c": "Apenas em situações de laboratório.",
+      "d": "Que é sempre fraca e de pouca magnitude."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Qual dos cenários a seguir NÃO é explicado pelo condicionamento pavloviano?",
+    "opcoes": {
+      "a": "Um cão salivando ao ouvir o barulho do saco de ração.",
+      "b": "Uma pessoa sentindo náuseas ao cheirar um alimento que já a fez passar mal.",
+      "c": "Uma criança recebendo um doce por ter arrumado o quarto.",
+      "d": "Um paciente sentindo ansiedade ao entrar em um hospital onde passou por uma cirurgia."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A aquisição de novos reflexos é uma demonstração de que:",
+    "opcoes": {
+      "a": "O comportamento é fixo e imutável.",
+      "b": "Os reflexos inatos são suficientes para a adaptação.",
+      "c": "Os organismos são capazes de aprender e se adaptar a ambientes em mudança.",
+      "d": "A aprendizagem só ocorre de forma consciente."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A resposta condicionada (CR) e a resposta incondicionada (UR) são:",
+    "opcoes": {
+      "a": "Sempre idênticas em todos os aspectos.",
+      "b": "Completamente diferentes e sem nenhuma relação.",
+      "c": "Muitas vezes similares, mas a CR é eliciada pelo CS e a UR pelo US.",
+      "d": "A CR é voluntária e a UR é involuntária."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "No slide sobre a 'Fórmula do Condicionamento Pavloviano', o que o termo 'Emparelhamento' conecta?",
+    "opcoes": {
+      "a": "O Estímulo Incondicionado com a Resposta Incondicionada.",
+      "b": "O Estímulo Neutro com o Estímulo Incondicionado.",
+      "c": "O Estímulo Condicionado com a Resposta Condicionada.",
+      "d": "A Resposta Incondicionada com a Resposta Condicionada."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A principal limitação dos reflexos inatos que leva à necessidade de reflexos aprendidos é:",
+    "opcoes": {
+      "a": "Eles são muito fracos.",
+      "b": "Eles só existem em animais, não em humanos.",
+      "c": "Eles não são suficientes para lidar com um ambiente em constante mudança.",
+      "d": "Eles desaparecem com a idade."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O que aconteceria no experimento de Pavlov se ele continuasse a tocar o sino sem nunca mais apresentar a comida?",
+    "opcoes": {
+      "a": "O cão salivaria cada vez mais forte (Potenciação).",
+      "b": "O cão começaria a responder a outros sons (Generalização).",
+      "c": "A resposta de salivação ao sino diminuiria gradualmente até desaparecer (Extinção).",
+      "d": "Nada mudaria, a resposta continuaria para sempre."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "De acordo com a Análise do Comportamento, o que é um 'Estímulo' (S)?",
+    "opcoes": {
+      "a": "Uma mudança no organismo.",
+      "b": "Uma parte ou uma mudança em uma parte do ambiente.",
+      "c": "A relação entre o ambiente e o organismo.",
+      "d": "Um comportamento involuntário."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Como é definida uma 'Resposta' (R) no contexto do comportamento reflexo?",
+    "opcoes": {
+      "a": "Uma mudança no ambiente causada pelo organismo.",
+      "b": "A causa de um comportamento.",
+      "c": "Uma mudança no organismo.",
+      "d": "Uma ação voluntária e consciente."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O que é um 'Reflexo' (S → R)?",
+    "opcoes": {
+      "a": "Apenas a ação realizada por um organismo.",
+      "b": "Apenas o evento ambiental que antecede uma ação.",
+      "c": "Uma relação onde um estímulo elicia uma resposta.",
+      "d": "Um comportamento que foi aprendido ao longo da vida."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Qual termo é usado para descrever a ação de um estímulo que 'produz' ou 'causa' uma resposta reflexa?",
+    "opcoes": {
+      "a": "Emitir",
+      "b": "Gerar",
+      "c": "Provocar",
+      "d": "Eliciar"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "A contração da pupila (resposta) devido a uma luz intensa (estímulo) é um exemplo de qual tipo de comportamento?",
+    "opcoes": {
+      "a": "Comportamento operante",
+      "b": "Comportamento aprendido",
+      "c": "Comportamento reflexo",
+      "d": "Comportamento voluntário"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Qual lei do reflexo estabelece que a intensidade do estímulo é diretamente proporcional à magnitude da resposta?",
+    "opcoes": {
+      "a": "Lei do Limiar",
+      "b": "Lei da Latência",
+      "c": "Lei da Intensidade e Magnitude",
+      "d": "Lei da Habituação"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Um barulho muito alto (estímulo) causa um susto maior (resposta) do que um barulho baixo. Este fato exemplifica qual lei?",
+    "opcoes": {
+      "a": "Lei do Limiar",
+      "b": "Lei da Intensidade e Magnitude",
+      "c": "Lei da Latência",
+      "d": "Lei da Potenciação"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A 'Lei do Limiar' afirma que:",
+    "opcoes": {
+      "a": "Todo estímulo, por menor que seja, elicia uma resposta.",
+      "b": "Para todo reflexo, existe uma intensidade mínima do estímulo necessária para que a resposta seja eliciada.",
+      "c": "A resposta é sempre proporcional à intensidade do estímulo.",
+      "d": "O tempo de resposta diminui com o aumento da intensidade do estímulo."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'latência' no contexto das leis do reflexo?",
+    "opcoes": {
+      "a": "A força da resposta.",
+      "b": "O tempo decorrido entre a apresentação do estímulo e a ocorrência da resposta.",
+      "c": "A intensidade mínima para uma resposta ocorrer.",
+      "d": "A diminuição da resposta após repetições."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Segundo a 'Lei da Latência', quanto maior a intensidade de um estímulo:",
+    "opcoes": {
+      "a": "Maior será a latência (atraso) da resposta.",
+      "b": "Menor será a latência (atraso) da resposta.",
+      "c": "A latência da resposta não será afetada.",
+      "d": "Maior será a magnitude da latência."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'Habituação'?",
+    "opcoes": {
+      "a": "Um aumento na magnitude da resposta quando um estímulo é apresentado repetidamente.",
+      "b": "Um decréscimo na magnitude da resposta quando um estímulo é apresentado repetidamente.",
+      "c": "O tempo que leva para uma resposta ocorrer.",
+      "d": "O aprendizado de um novo reflexo."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Ao entrar em um local com um cheiro forte, a percepção desse cheiro diminui com o tempo. Isso é um exemplo de:",
+    "opcoes": {
+      "a": "Potenciação",
+      "b": "Latência",
+      "c": "Habituação",
+      "d": "Limiar"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "O que é 'Potenciação' (ou sensibilização)?",
+    "opcoes": {
+      "a": "Um aumento na magnitude da resposta quando um estímulo é apresentado repetidamente.",
+      "b": "Um decréscimo na magnitude da resposta quando um estímulo é apresentado repetidamente.",
+      "c": "A capacidade de aprender novos comportamentos.",
+      "d": "A relação entre intensidade e magnitude."
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "O som repetitivo de uma goteira, que inicialmente é ignorado, pode se tornar cada vez mais irritante ao longo do tempo. Este fenômeno é um exemplo de:",
+    "opcoes": {
+      "a": "Habituação",
+      "b": "Lei do Limiar",
+      "c": "Latência",
+      "d": "Potenciação"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Qual é a relação entre os reflexos inatos e as emoções, segundo o material?",
+    "opcoes": {
+      "a": "As emoções são comportamentos completamente voluntários e não têm relação com reflexos.",
+      "b": "Muitas das emoções que sentimos são parte de comportamentos reflexos.",
+      "c": "Reflexos e emoções são a mesma coisa.",
+      "d": "As emoções controlam os reflexos, mas não o contrário."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O que é 'Filogênese'?",
+    "opcoes": {
+      "a": "A história de vida de um único organismo.",
+      "b": "A história evolutiva de uma espécie ou grupo de organismos.",
+      "c": "O estudo da genética de um indivíduo.",
+      "d": "O desenvolvimento de reflexos aprendidos."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Por que os reflexos inatos e as respostas emocionais associadas a eles têm valor de sobrevivência?",
+    "opcoes": {
+      "a": "Porque eles nos tornam mais inteligentes.",
+      "b": "Porque foram selecionados ao longo da evolução das espécies por ajudarem na adaptação ao ambiente.",
+      "c": "Porque são aprendidos com os pais e a cultura.",
+      "d": "Porque podem ser facilmente controlados pela vontade."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "No exemplo do slide 'O susto foi eliciado por um toque inesperado', o que representa o 'toque inesperado'?",
+    "opcoes": {
+      "a": "A Resposta (R)",
+      "b": "O Estímulo (S)",
+      "c": "O Reflexo",
+      "d": "A Latência"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "No exemplo do slide 'O suar é uma reação ao calor', o que representa 'o suar'?",
+    "opcoes": {
+      "a": "O Estímulo (S)",
+      "b": "A Resposta (R)",
+      "c": "A Magnitude",
+      "d": "A Intensidade"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Reflexos inatos são comportamentos que:",
+    "opcoes": {
+      "a": "Precisam ser ensinados cuidadosamente.",
+      "b": "Variam muito de um indivíduo para outro da mesma espécie.",
+      "c": "Fazem parte do repertório comportamental desde o nascimento.",
+      "d": "São adquiridos apenas na vida adulta."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Qual das alternativas abaixo NÃO é uma das três leis do reflexo apresentadas?",
+    "opcoes": {
+      "a": "Lei da Intensidade e Magnitude",
+      "b": "Lei da Filogênese",
+      "c": "Lei do Limiar",
+      "d": "Lei da Latência"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "O conceito de 'magnitude' da resposta refere-se ao(à):",
+    "opcoes": {
+      "a": "'Quanto de resposta' ou à força da resposta.",
+      "b": "'Quanto de estímulo' ou à força do estímulo.",
+      "c": "Tempo de reação.",
+      "d": "Duração do estímulo."
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "O conceito de 'intensidade' do estímulo refere-se ao(à):",
+    "opcoes": {
+      "a": "'Quanto de resposta' ou à força da resposta.",
+      "b": "'Quanto de estímulo' ou à força do estímulo.",
+      "c": "Duração da resposta.",
+      "d": "Complexidade do ambiente."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A diferença entre Habituação e Potenciação está em:",
+    "opcoes": {
+      "a": "Na habituação a resposta aumenta; na potenciação, diminui.",
+      "b": "Na habituação a resposta diminui; na potenciação, aumenta.",
+      "c": "A habituação é um reflexo inato; a potenciação é aprendida.",
+      "d": "A habituação se refere ao estímulo; a potenciação se refere à resposta."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Por que o controle emocional pode ser tão desafiador?",
+    "opcoes": {
+      "a": "Porque as emoções não são comportamentos reais.",
+      "b": "Porque as emoções são aprendidas de forma errada.",
+      "c": "Porque muitas emoções são parte de comportamentos reflexos, que são involuntários.",
+      "d": "Porque as emoções dependem do pensamento lógico."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A história evolutiva da espécie é o principal determinante para qual tipo de comportamento?",
+    "opcoes": {
+      "a": "Reflexos aprendidos",
+      "b": "Comportamentos operantes",
+      "c": "Reflexos inatos",
+      "d": "Comportamentos sociais complexos"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Qual dos seguintes exemplos melhor ilustra a Lei do Limiar?",
+    "opcoes": {
+      "a": "Chorar mais alto quando a dor é maior.",
+      "b": "Não sentir um toque muito leve na pele, mas sentir um toque mais forte.",
+      "c": "Pular mais rápido ao ouvir um som mais alto.",
+      "d": "Se acostumar com o barulho do ar-condicionado."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Um arrepio que dura mais tempo em um dia muito frio do que em um dia ameno demonstra uma relação entre:",
+    "opcoes": {
+      "a": "Intensidade do estímulo e duração da resposta.",
+      "b": "Latência e magnitude.",
+      "c": "Habituação e limiar.",
+      "d": "Potenciação e intensidade."
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "Quando dizemos que um reflexo é uma 'relação', estamos nos referindo à conexão entre:",
+    "opcoes": {
+      "a": "Dois estímulos diferentes.",
+      "b": "Duas respostas diferentes.",
+      "c": "Um estímulo e uma resposta.",
+      "d": "Um organismo e sua espécie."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "No dia a dia, o termo 'reflexo' é frequentemente usado como sinônimo de 'resposta'. Por que essa utilização é imprecisa do ponto de vista da Análise do Comportamento?",
+    "opcoes": {
+      "a": "Porque reflexo é sinônimo de estímulo, não de resposta.",
+      "b": "Porque o reflexo se refere à relação S-R, e não apenas à resposta (R).",
+      "c": "Porque todos os reflexos são lentos, ao contrário do uso popular do termo.",
+      "d": "Porque na psicologia, o termo 'reflexo' não é utilizado."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Os reflexos inatos são considerados uma 'preparação mínima' para a sobrevivência porque:",
+    "opcoes": {
+      "a": "Garantem que o organismo saiba tudo o que precisa para viver.",
+      "b": "Permitem as primeiras interações com o ambiente, aumentando as chances de sobreviver.",
+      "c": "São a base para o desenvolvimento da linguagem.",
+      "d": "Só funcionam durante a infância."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Qual dos seguintes itens é um exemplo de um Estímulo (S)?",
+    "opcoes": {
+      "a": "Salivação",
+      "b": "Contração muscular",
+      "c": "Aumento da frequência cardíaca",
+      "d": "Um barulho estridente"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Qual dos seguintes itens é um exemplo de uma Resposta (R)?",
+    "opcoes": {
+      "a": "Luz no olho",
+      "b": "Comida na boca",
+      "c": "Lacrimejar",
+      "d": "Choque elétrico"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Se um médico bate com um martelo no seu joelho (S), e sua perna se move (R), qual é o reflexo?",
+    "opcoes": {
+      "a": "O movimento da perna.",
+      "b": "A batida do martelo.",
+      "c": "A relação entre a batida do martelo e o movimento da perna.",
+      "d": "A intenção do médico."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Se a repetição de uma piada diminui a intensidade da risada, qual processo está ocorrendo?",
+    "opcoes": {
+      "a": "Potenciação",
+      "b": "Lei da Latência",
+      "c": "Lei do Limiar",
+      "d": "Habituação"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Se a repetição de um toque irritante aumenta a magnitude da irritação, qual processo está ocorrendo?",
+    "opcoes": {
+      "a": "Habituação",
+      "b": "Potenciação",
+      "c": "Lei da Latência",
+      "d": "Lei do Limiar"
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A afirmação 'Boa parte daquilo que entendemos como emoções faz parte da fisiologia do organismo' significa que:",
+    "opcoes": {
+      "a": "As emoções são apenas pensamentos e não envolvem o corpo.",
+      "b": "As emoções são acompanhadas por reações corporais como alterações hormonais e cardíacas.",
+      "c": "A fisiologia é uma emoção.",
+      "d": "Emoções e doenças são a mesma coisa."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A frase 'O choro é um comportamento reflexo, por isso às vezes é tão difícil segurá-lo' está alinhada com qual ideia apresentada?",
+    "opcoes": {
+      "a": "Que o choro é sempre um sinal de fraqueza.",
+      "b": "Que as emoções, por serem reflexas, são em grande parte involuntárias.",
+      "c": "Que chorar é um comportamento aprendido.",
+      "d": "Que apenas bebês têm reflexos de choro."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Um cozinheiro que corta muitas cebolas percebe que lacrimeja menos ao cortar as últimas cebolas em comparação com as primeiras. Este é um exemplo de:",
+    "opcoes": {
+      "a": "Lei da Latência",
+      "b": "Potenciação",
+      "c": "Habituação",
+      "d": "Lei do Limiar"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A relação funcional S -> R é característica de qual tipo de comportamento?",
+    "opcoes": {
+      "a": "Respondente (Reflexo)",
+      "b": "Operante",
+      "c": "Social",
+      "d": "Verbal"
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "A 'intensidade' e a 'magnitude' são conceitos que se referem, respectivamente, a:",
+    "opcoes": {
+      "a": "Estímulo e Estímulo",
+      "b": "Resposta e Resposta",
+      "c": "Resposta e Estímulo",
+      "d": "Estímulo e Resposta"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "Um estímulo com intensidade abaixo do limiar irá:",
+    "opcoes": {
+      "a": "Eliciar uma resposta fraca.",
+      "b": "Eliciar uma resposta forte.",
+      "c": "Não eliciar a resposta.",
+      "d": "Eliciar a resposta com uma grande latência."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "Os reflexos são considerados comportamentos involuntários porque:",
+    "opcoes": {
+      "a": "Ocorrem sem que precisemos pensar ou decidir sobre eles.",
+      "b": "São sempre lentos e graduais.",
+      "c": "São aprendidos na escola.",
+      "d": "São exclusivos dos animais não-humanos."
+    },
+    "resposta_correta": "a"
+  },
+  {
+    "pergunta": "Qual é a importância da Análise do Comportamento estudar os reflexos inatos?",
+    "opcoes": {
+      "a": "Não há importância, pois são comportamentos muito simples.",
+      "b": "É a base para entender comportamentos mais simples, incluindo as emoções, e como novos reflexos podem ser aprendidos.",
+      "c": "Serve apenas para entender o comportamento animal, não o humano.",
+      "d": "O principal objetivo é eliminar todos os reflexos inatos."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "A quantidade de saliva produzida (gotas) ao colocar comida na boca é uma medida de qual aspecto da resposta?",
+    "opcoes": {
+      "a": "Latência",
+      "b": "Limiar",
+      "c": "Magnitude",
+      "d": "Intensidade"
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A quantidade de comida colocada na boca (em gramas) é uma medida de qual aspecto do estímulo?",
+    "opcoes": {
+      "a": "Latência",
+      "b": "Limiar",
+      "c": "Magnitude",
+      "d": "Intensidade"
+    },
+    "resposta_correta": "d"
+  },
+  {
+    "pergunta": "A repetição de um estímulo pode ter qual dos seguintes efeitos sobre a resposta reflexa?",
+    "opcoes": {
+      "a": "Apenas o aumento da magnitude (Potenciação).",
+      "b": "Apenas a diminuição da magnitude (Habituação).",
+      "c": "Pode causar tanto a diminuição (Habituação) quanto o aumento (Potenciação) da magnitude, dependendo do reflexo.",
+      "d": "Não tem nenhum efeito sobre a resposta reflexa."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "No slide sobre a Lei da Latência, a imagem de um jogo com 'Ping: 40ms' ilustra que:",
+    "opcoes": {
+      "a": "Um estímulo fraco leva a uma resposta rápida.",
+      "b": "Um estímulo forte leva a uma resposta demorada.",
+      "c": "A latência é o tempo de atraso entre o estímulo e a resposta.",
+      "d": "Jogos de computador causam reflexos lentos."
+    },
+    "resposta_correta": "c"
+  },
+  {
+    "pergunta": "A análise do comportamento reflexo foca em comportamentos que são primariamente determinados pela:",
+    "opcoes": {
+      "a": "História de vida do indivíduo (ontogênese).",
+      "b": "História evolutiva da espécie (filogênese).",
+      "c": "Cultura e regras sociais.",
+      "d": "Decisões e escolhas conscientes."
+    },
+    "resposta_correta": "b"
+  },
+  {
+    "pergunta": "Qual das seguintes afirmações melhor resume a visão apresentada sobre as emoções no Capítulo 1?",
+    "opcoes": {
+      "a": "Emoções são fenômenos misteriosos que a ciência não pode estudar.",
+      "b": "Emoções são respostas fisiológicas e comportamentais com valor de sobrevivência, muitas das quais são de natureza reflexa.",
+      "c": "Emoções são puramente cognitivas e não envolvem o corpo.",
+      "d": "Emoções são comportamentos ruins que devem ser suprimidos."
+    },
+    "resposta_correta": "b"
+  }
+]

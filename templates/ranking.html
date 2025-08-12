@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Ranking Geral</h1>
+    <ol>
+        {% for user in users %}
+            <li>
+                <strong>{{ user.nome }}</strong> (Turma: {{ user.turma }}) - {{ user.pontuacao }} pontos
+            </li>
+        {% else %}
+            <li>Nenhum jogador no ranking ainda.</li>
+        {% endfor %}
+    </ol>
+{% endblock %}

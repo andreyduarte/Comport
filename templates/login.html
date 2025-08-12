@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Bem-vindo ao Quiz de Análise do Comportamento!</h1>
+    <p>Faça seu cadastro para começar a jogar ou entre com seus dados.</p>
+
+    <div style="display: flex; justify-content: space-around;">
+        
+        <!-- Formulário de Cadastro -->
+        <form action="/" method="post" style="width: 45%;">
+            <h2>Cadastre-se</h2>
+            <label for="reg_nome">Nome:</label><br>
+            <input type="text" id="reg_nome" name="nome" required><br><br>
+            
+            <label for="turma">Turma:</label><br>
+            <input type="text" id="turma" name="turma" required><br><br>
+            
+            <label for="reg_senha">Senha:</label><br>
+            <input type="password" id="reg_senha" name="senha" required><br><br>
+            
+            <button type="submit" name="action" value="register" class="btn">Cadastrar e Jogar</button>
+        </form>
+
+        <!-- Formulário de Login -->
+        <form action="/" method="post" style="width: 45%;">
+            <h2>Login</h2>
+            <label for="login_nome">Nome:</label><br>
+            <input type="text" id="login_nome" name="nome" required><br><br>
+            
+            <label for="login_senha">Senha:</label><br>
+            <input type="password" id="login_senha" name="senha" required><br><br>
+
+            <button type="submit" name="action" value="login" class="btn">Entrar</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if is_correct %}
+        <h1 style="color: green;">Parabéns, você acertou!</h1>
+        <p><strong>Reforço Positivo:</strong> +10 pontos foram adicionados à sua pontuação!</p>
+    {% else %}
+        <h1 style="color: red;">Resposta Incorreta!</h1>
+        <p>A resposta correta para a pergunta <em>"{{ question.pergunta }}"</em> era:</p>
+        <p><strong>{{ correct_answer }}</strong></p>
+        <p>Não desanime! O erro faz parte do aprendizado. 😉</p>
+    {% endif %}
+    
+    <br>
+    <a href="{{ url_for('jogar') }}" class="btn">Próxima Pergunta &rarr;</a>
+{% endblock %}

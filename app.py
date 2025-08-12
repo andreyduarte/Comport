@@ -76,12 +76,31 @@ def migrate_from_json():
             db.session.rollback()
 
 def create_teacher_account():
-    """Cria conta de professor se não existir"""
-    teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
-    teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
-    teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
-    
+    """Cria contas de administrador e professor se não existirem"""
     with app.app_context():
+        # Conta administrador
+        admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+        admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
+        admin_turma = os.getenv('ADMIN_TURMA', 'Administrador')
+        
+        if not User.query.get(admin_username):
+            admin = User(
+                username=admin_username,
+                senha=admin_password,
+                turma=admin_turma,
+                pontuacao=0,
+                combo=0,
+                max_combo=0,
+                is_teacher=True
+            )
+            db.session.add(admin)
+            print(f"Conta administrador '{admin_username}' criada com sucesso!")
+        
+        # Conta professor
+        teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
+        teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
+        teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
+        
         if not User.query.get(teacher_username):
             teacher = User(
                 username=teacher_username,
@@ -93,8 +112,9 @@ def create_teacher_account():
                 is_teacher=True
             )
             db.session.add(teacher)
-            db.session.commit()
-            print(f"Conta de professor '{teacher_username}' criada com sucesso!")
+            print(f"Conta professor '{teacher_username}' criada com sucesso!")
+        
+        db.session.commit()
 
 def load_questions():
     with open('QUESTOES.json', 'r', encoding='utf-8') as f:

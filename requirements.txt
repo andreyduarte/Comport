@@ -1,5 +1,4 @@
 Flask
 gunicorn
 python-dotenv
-PyMuPDF
-Flask-SQLAlchemy
+psycopg2-binary

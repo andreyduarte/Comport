@@ -1,18 +1,36 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: quiz_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: quiz
+      POSTGRES_USER: quiz_user
+      POSTGRES_PASSWORD: quiz_pass
+    volumes:
+      - quiz_data:/var/lib/postgresql/data
+    networks:
+      - quiz-network
+
   psicoquiz:
     build: .
     container_name: psicoquiz
     restart: unless-stopped
     ports:
       - "5001:5000"
-    volumes:
-      - ./quiz.db:/app/quiz.db
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgresql://quiz_user:quiz_pass@db:5432/quiz
+    depends_on:
+      - db
     networks:
       - quiz-network
+
+volumes:
+  quiz_data:
 
 networks:
   quiz-network:

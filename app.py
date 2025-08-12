@@ -1,36 +1,36 @@
 import json
 import random
 import os
-import sqlite3
+import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-# Caminho absoluto para o banco
-DB_PATH = os.path.join(os.getcwd(), 'quiz.db')
+# Configuração do banco PostgreSQL
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://quiz_user:quiz_pass@localhost:5432/quiz')
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
 
 def init_db():
     """Inicializa o banco de dados"""
-    conn = sqlite3.connect(DB_PATH)
+    conn = psycopg2.connect(DATABASE_URL)
     cursor = conn.cursor()
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            senha TEXT NOT NULL,
-            turma TEXT NOT NULL,
+            username VARCHAR(50) PRIMARY KEY,
+            senha VARCHAR(255) NOT NULL,
+            turma VARCHAR(100) NOT NULL,
             pontuacao INTEGER DEFAULT 0,
             combo INTEGER DEFAULT 0,
             max_combo INTEGER DEFAULT 0,
-            is_teacher BOOLEAN DEFAULT 0
+            is_teacher BOOLEAN DEFAULT FALSE
         )
     ''')
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_questions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50),
             question_id INTEGER,
             is_correct BOOLEAN,
             FOREIGN KEY (username) REFERENCES users (username)
@@ -39,9 +39,9 @@ def init_db():
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_achievements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            achievement_key TEXT,
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50),
+            achievement_key VARCHAR(50),
             FOREIGN KEY (username) REFERENCES users (username)
         )
     ''')
@@ -56,17 +56,24 @@ def migrate_from_json():
             users_data = json.load(f)
         
         try:
-            conn = sqlite3.connect(DB_PATH)
+            conn = psycopg2.connect(DATABASE_URL)
             cursor = conn.cursor()
-        except sqlite3.OperationalError as e:
+        except psycopg2.Error as e:
             print(f"Erro na migração: {e}")
             return
         
         for username, data in users_data.items():
             cursor.execute('''
-                INSERT OR REPLACE INTO users 
+                INSERT INTO users 
                 (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (username) DO UPDATE SET
+                senha = EXCLUDED.senha,
+                turma = EXCLUDED.turma,
+                pontuacao = EXCLUDED.pontuacao,
+                combo = EXCLUDED.combo,
+                max_combo = EXCLUDED.max_combo,
+                is_teacher = EXCLUDED.is_teacher
             ''', (
                 username,
                 data.get('senha', ''),
@@ -81,15 +88,17 @@ def migrate_from_json():
             for q_id in data.get('answered_questions', []):
                 is_correct = q_id in data.get('correct_questions', [])
                 cursor.execute('''
-                    INSERT OR IGNORE INTO user_questions 
-                    (username, question_id, is_correct) VALUES (?, ?, ?)
+                    INSERT INTO user_questions 
+                    (username, question_id, is_correct) VALUES (%s, %s, %s)
+                    ON CONFLICT DO NOTHING
                 ''', (username, q_id, is_correct))
             
             # Migra achievements
             for achievement in data.get('achievements', []):
                 cursor.execute('''
-                    INSERT OR IGNORE INTO user_achievements 
-                    (username, achievement_key) VALUES (?, ?)
+                    INSERT INTO user_achievements 
+                    (username, achievement_key) VALUES (%s, %s)
+                    ON CONFLICT DO NOTHING
                 ''', (username, achievement))
         
         conn.commit()

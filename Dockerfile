@@ -13,7 +13,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=appuser:appuser . .
-RUN touch quiz.db && chown appuser:appuser quiz.db && chmod 664 quiz.db
+RUN touch quiz.db && chown appuser:appuser quiz.db && chmod 664 quiz.db && \
+    mkdir -p migrations && chown appuser:appuser migrations
 
 USER appuser
 EXPOSE 5000

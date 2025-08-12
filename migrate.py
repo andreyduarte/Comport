@@ -11,6 +11,8 @@ def init_migrations():
     """Inicializa o sistema de migrações"""
     with app.app_context():
         try:
+            # Garante que a pasta migrations existe
+            os.makedirs('migrations', exist_ok=True)
             init()
             print("Sistema de migrações inicializado!")
         except Exception as e:

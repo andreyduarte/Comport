@@ -19,16 +19,10 @@ migrate = Migrate(app, db)
 def init_db():
     """Inicializa o banco de dados com migrações"""
     try:
-        from flask_migrate import upgrade
         with app.app_context():
-            # Tenta executar migrações primeiro
-            try:
-                upgrade()
-                print("Migrações aplicadas com sucesso!")
-            except Exception:
-                # Se não há migrações, cria tabelas diretamente
-                db.create_all()
-                print("Tabelas criadas com sucesso!")
+            # Sempre cria tabelas diretamente (mais confiável)
+            db.create_all()
+            print("Tabelas criadas com sucesso!")
             return True
     except Exception as e:
         print(f"Erro ao inicializar banco: {e}")

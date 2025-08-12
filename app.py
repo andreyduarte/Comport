@@ -12,8 +12,13 @@ app.secret_key = 'super_secret_key_change_this'
 
 def init_db():
     """Inicializa o banco de dados"""
-    conn = psycopg2.connect(DATABASE_URL)
-    cursor = conn.cursor()
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor()
+        print("Conectado ao PostgreSQL com sucesso!")
+    except psycopg2.Error as e:
+        print(f"Erro ao conectar ao PostgreSQL: {e}")
+        return False
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -33,6 +38,7 @@ def init_db():
             username VARCHAR(50),
             question_id INTEGER,
             is_correct BOOLEAN,
+            UNIQUE(username, question_id),
             FOREIGN KEY (username) REFERENCES users (username)
         )
     ''')
@@ -42,12 +48,18 @@ def init_db():
             id SERIAL PRIMARY KEY,
             username VARCHAR(50),
             achievement_key VARCHAR(50),
+            UNIQUE(username, achievement_key),
             FOREIGN KEY (username) REFERENCES users (username)
         )
     ''')
     
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
+        print("Tabelas criadas com sucesso!")
+        return True
+    except psycopg2.Error as e:
+        print(f"Erro ao criar tabelas: {e}")
+        return False
 
 def migrate_from_json():
     """Migra dados do JSON para PostgreSQL"""
@@ -90,7 +102,7 @@ def migrate_from_json():
                 cursor.execute('''
                     INSERT INTO user_questions 
                     (username, question_id, is_correct) VALUES (%s, %s, %s)
-                    ON CONFLICT DO NOTHING
+                    ON CONFLICT (username, question_id) DO NOTHING
                 ''', (username, q_id, is_correct))
             
             # Migra achievements
@@ -98,7 +110,7 @@ def migrate_from_json():
                 cursor.execute('''
                     INSERT INTO user_achievements 
                     (username, achievement_key) VALUES (%s, %s)
-                    ON CONFLICT DO NOTHING
+                    ON CONFLICT (username, achievement_key) DO NOTHING
                 ''', (username, achievement))
         
         conn.commit()
@@ -215,10 +227,8 @@ def check_new_achievements(user_data, rank=999):
     new_achievements = []
     for key, achievement in achievements.items():
         if key not in user_achievements and check_achievement_condition(achievement, user_data):
-            user_achievements.add(key)
             new_achievements.append(achievement)
     
-    user_data['achievements'] = list(user_achievements)
     return new_achievements
 
 def get_user(username):
@@ -234,12 +244,12 @@ def get_user(username):
             conn.close()
             return None
         
-        # Busca questões respondidas
-        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = %s', (username,))
+        # Busca questões respondidas (com ORDER BY para consistência)
+        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = %s ORDER BY id', (username,))
         questions = cursor.fetchall()
         
-        # Busca achievements
-        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = %s', (username,))
+        # Busca achievements (com ORDER BY para consistência)
+        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = %s ORDER BY id', (username,))
         achievements = [row[0] for row in cursor.fetchall()]
         
         conn.close()
@@ -315,7 +325,7 @@ def add_user_question(username, question_id, is_correct):
         cursor.execute('''
             INSERT INTO user_questions 
             (username, question_id, is_correct) VALUES (%s, %s, %s)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (username, question_id) DO NOTHING
         ''', (username, question_id, is_correct))
         
         conn.commit()
@@ -332,7 +342,7 @@ def add_user_achievement(username, achievement_key):
         cursor.execute('''
             INSERT INTO user_achievements 
             (username, achievement_key) VALUES (%s, %s)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (username, achievement_key) DO NOTHING
         ''', (username, achievement_key))
         
         conn.commit()
@@ -529,10 +539,21 @@ def responder():
     
     username = session['username']
     user_data = get_user(username)
+    
+    if not user_data:
+        flash("Erro ao carregar dados do usuário", "error")
+        return redirect(url_for('login_register'))
+        
     current_combo = session.get('combo', 0)
     
     # Adiciona questão respondida
     add_user_question(username, question_id, is_correct)
+    
+    # Recarrega dados do usuário após adicionar questão
+    user_data = get_user(username)
+    if not user_data:
+        flash("Erro ao recarregar dados do usuário", "error")
+        return redirect(url_for('login_register'))
     
     new_achievements = []
     
@@ -567,8 +588,12 @@ def responder():
         session['combo_bonus'] = combo_bonus * 100
         session['time_bonus'] = time_bonus
         
+        # Calcula ranking para achievements
+        all_users = get_all_users()
+        user_rank = next((i+1 for i, u in enumerate(all_users) if u['nome'] == username), 999)
+        
         # Verifica novos achievements
-        new_achievements = check_new_achievements(user_data)
+        new_achievements = check_new_achievements(user_data, user_rank)
         
         # Adiciona novos achievements ao banco
         for achievement in new_achievements:
@@ -580,7 +605,8 @@ def responder():
     else:
         # Reset combo
         session['combo'] = 0
-        user_data['combo'] = 0
+        if user_data:
+            user_data['combo'] = 0
     
     save_user(username, user_data)
     
@@ -595,7 +621,10 @@ def responder():
                            new_achievements=new_achievements)
 
 if __name__ == '__main__':
-    init_db()
-    migrate_from_json()
-    create_teacher_account()
+    if init_db():
+        migrate_from_json()
+        create_teacher_account()
+    else:
+        print("Falha ao inicializar banco de dados")
+    
     app.run(host='0.0.0.0', port=5000, debug=False)

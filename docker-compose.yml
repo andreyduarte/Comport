@@ -11,6 +11,11 @@ services:
       POSTGRES_PASSWORD: quiz_pass
     volumes:
       - quiz_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quiz_user -d quiz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - quiz-network
 
@@ -25,7 +30,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://quiz_user:quiz_pass@db:5432/quiz
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - quiz-network
 

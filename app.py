@@ -19,6 +19,7 @@ def create_teacher_account():
             'turma': teacher_turma,
             'pontuacao': 0,
             'combo': 0,
+            'max_combo': 0,
             'correct_questions': [],
             'answered_questions': [],
             'achievements': [],
@@ -49,19 +50,36 @@ ALL_QUESTIONS = load_questions()
 
 def get_achievements():
     return {
-        'primeiro_passo':    {'name': 'Primeiro Passo',      'desc': '10+ moedas',                  'icon': '🎆', 'type': 'score',          'threshold': 10},
-        'estudioso':         {'name': 'Estudioso',           'desc': '50+ moedas',                  'icon': '🌟', 'type': 'score',          'threshold': 50},
-        'expert':            {'name': 'Expert',              'desc': '100+ moedas',                 'icon': '🧠', 'type': 'score',          'threshold': 100},
-        'mestre':            {'name': 'Mestre',              'desc': '200+ moedas',                 'icon': '👑', 'type': 'score',          'threshold': 200},
-        'top3':              {'name': 'Top 3',               'desc': 'Ranking',                     'icon': '🏆', 'type': 'rank',           'threshold': 3},
+        # Achievements baseados em questões respondidas
+        'primeiro_passo':    {'name': 'Primeiro Passo',      'desc': 'Responda 5 questões',         'icon': '🎆', 'type': 'questions',      'threshold': 5},
+        'estudioso':         {'name': 'Estudioso',           'desc': 'Responda 20 questões',        'icon': '🌟', 'type': 'questions',      'threshold': 20},
+        'expert':            {'name': 'Expert',              'desc': 'Responda 50 questões',        'icon': '🐭', 'type': 'questions',      'threshold': 50},
+        'mestre':            {'name': 'Mestre',              'desc': 'Responda 100 questões',       'icon': '👑', 'type': 'questions',      'threshold': 100},
+        'dedicado':          {'name': 'Dedicado',            'desc': 'Responda 150 questões',       'icon': '📚', 'type': 'questions',      'threshold': 150},
+        'incansavel':        {'name': 'Incansável',          'desc': 'Responda 200 questões',       'icon': '🚀', 'type': 'questions',      'threshold': 200},
+        'lenda':             {'name': 'Lenda',               'desc': 'Responda 300 questões',       'icon': '🏛️', 'type': 'questions',      'threshold': 300},
+        
+        # Achievements de ranking
+        'top10':             {'name': 'Top 10',              'desc': 'Fique entre os 10 primeiros', 'icon': '🥉', 'type': 'rank',           'threshold': 10},
+        'top5':              {'name': 'Top 5',               'desc': 'Fique entre os 5 primeiros',  'icon': '🥈', 'type': 'rank',           'threshold': 5},
+        'top3':              {'name': 'Top 3',               'desc': 'Fique entre os 3 primeiros',  'icon': '🥇', 'type': 'rank',           'threshold': 3},
+        'campeao':           {'name': 'Campeão',             'desc': 'Seja o 1º colocado',          'icon': '🏆', 'type': 'rank',           'threshold': 1},
+        
+        # Achievements de combo
         'combo_fire':        {'name': 'Em Chamas',           'desc': 'Combo 10x',                   'icon': '🔥', 'type': 'combo',          'threshold': 10},
         'combo_master':      {'name': 'Combo Master',        'desc': 'Combo 25x',                   'icon': '⚡', 'type': 'combo',          'threshold': 25},
+        'speed_demon':       {'name': 'Demônio da Velocidade','desc': 'Combo 15x',                   'icon': '💨', 'type': 'combo',          'threshold': 15},
+        'combo_legend':      {'name': 'Lenda do Combo',      'desc': 'Combo 50x',                   'icon': '🌟', 'type': 'combo',          'threshold': 50},
+        'combo_god':         {'name': 'Deus do Combo',       'desc': 'Combo 100x',                  'icon': '👑', 'type': 'combo',          'threshold': 100},
+        
+        # Achievements temáticos
         'pavlov_expert':     {'name': 'Pavlov Expert',       'desc': 'Acerte 10 sobre Pavlov',      'icon': '🐕', 'type': 'theme',          'theme': 'pavlov',   'threshold': 10},
         'watson_master':     {'name': 'Watson Master',       'desc': 'Acerte 5 sobre Watson',       'icon': '👶', 'type': 'theme',          'theme': 'watson',   'threshold': 5},
         'reflexos_pro':      {'name': 'Reflexos Pro',        'desc': 'Acerte 15 sobre reflexos',    'icon': '⚡', 'type': 'theme',          'theme': 'reflexos', 'threshold': 15},
-        'completionist':     {'name': 'Completista',         'desc': 'Responda todas as questões', 'icon': '💯', 'type': 'completionist'},
-        'perfect_start':     {'name': 'Início Perfeito',     'desc': 'Acerte as 5 primeiras',      'icon': '🎯', 'type': 'perfect_start',  'threshold': 5},
-        'speed_demon':       {'name': 'Demônio da Velocidade','desc': 'Combo 15x',                   'icon': '💨', 'type': 'combo',          'threshold': 15}
+        
+        # Achievements especiais
+        'completionist':     {'name': 'Completista',         'desc': 'Responda todas as questões',  'icon': '💯', 'type': 'completionist'},
+        'perfect_start':     {'name': 'Início Perfeito',     'desc': 'Acerte as 5 primeiras',       'icon': '🎯', 'type': 'perfect_start',  'threshold': 5}
     }
 
 def check_achievement_condition(achievement, user_data):
@@ -69,12 +87,12 @@ def check_achievement_condition(achievement, user_data):
     a_type    = achievement.get('type')
     threshold = achievement.get('threshold', 0)
 
-    if a_type == 'score':
-        return user_data.get('pontuacao', 0) >= threshold
+    if a_type == 'questions':
+        return len(user_data.get('answered_questions', [])) >= threshold
     elif a_type == 'rank':
         return user_data.get('rank', 999) <= threshold
     elif a_type == 'combo':
-        return user_data.get('combo', 0) >= threshold
+        return user_data.get('max_combo', 0) >= threshold
     elif a_type == 'theme':
         theme = achievement.get('theme')
         count = sum(
@@ -99,7 +117,7 @@ def check_new_achievements(user_data, rank=999):
     
     new_achievements = []
     for key, achievement in achievements.items():
-        if key not in user_achievements and 'condition' in achievement and achievement['condition'](user_data):
+        if key not in user_achievements and check_achievement_condition(achievement, user_data):
             user_achievements.add(key)
             new_achievements.append(achievement)
     
@@ -142,6 +160,7 @@ def login_register():
                 'turma': turma, 
                 'pontuacao': 0, 
                 'combo': 0, 
+                'max_combo': 0,
                 'correct_questions': [], 
                 'answered_questions': [], 
                 'achievements': []
@@ -210,7 +229,14 @@ def perfil():
     achievements = get_achievements()
     user_achievements = {key: achievements[key] for key in user_data.get('achievements', []) if key in achievements}
     
-    return render_template('perfil.html', user=user_data, rank=user_rank, username=username, achievements=user_achievements)
+    # Calcula porcentagem de questões completadas
+    total_questions = len(ALL_QUESTIONS)
+    answered_questions = len(user_data.get('answered_questions', []))
+    completion_percentage = round((answered_questions / total_questions) * 100, 1) if total_questions > 0 else 0
+    
+    return render_template('perfil.html', user=user_data, rank=user_rank, username=username, 
+                         achievements=user_achievements, completion_percentage=completion_percentage,
+                         answered_questions=answered_questions, total_questions=total_questions)
 
 @app.route('/ranking')
 def ranking():
@@ -218,9 +244,19 @@ def ranking():
         return redirect(url_for('login_register'))
         
     users = load_users()
+    current_user = users.get(session['username'], {})
+    current_turma = current_user.get('turma', '')
+    
+    filter_type = request.args.get('filter', 'geral')
+    
     user_list = [{'nome': name, **data} for name, data in users.items()]
+    
+    if filter_type == 'turma' and current_turma:
+        user_list = [user for user in user_list if user.get('turma') == current_turma]
+    
     sorted_users = sorted(user_list, key=lambda x: x['pontuacao'], reverse=True)
-    return render_template('ranking.html', users=sorted_users)
+    
+    return render_template('ranking.html', users=sorted_users, filter_type=filter_type, current_turma=current_turma)
 
 @app.route('/usuario/<username>')
 def ver_usuario(username):
@@ -329,6 +365,10 @@ def responder():
         current_combo += 1
         session['combo'] = current_combo
         user_data['combo'] = current_combo
+        
+        # Atualiza max_combo se necessário
+        if current_combo > user_data.get('max_combo', 0):
+            user_data['max_combo'] = current_combo
         
         # Calcula bônus de moedas (1% por combo, máx 50%)
         combo_bonus = min(current_combo, 50) / 100

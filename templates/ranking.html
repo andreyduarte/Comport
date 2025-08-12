@@ -4,6 +4,24 @@
         <div style="font-size: 50px; margin-bottom: 10px;">🏆</div>
         <h1>Ranking</h1>
         <p style="color: #6c757d; font-size: 16px;">Veja quem está dominando a Análise do Comportamento!</p>
+        
+        <div class="filter-buttons" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+            <a href="{{ url_for('ranking', filter='geral') }}" 
+               class="filter-btn {{ 'active' if filter_type == 'geral' else '' }}"
+               style="padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; transition: all 0.3s;
+                      {{ 'background: linear-gradient(135deg, #58cc02 0%, #7dd55c 100%); color: white;' if filter_type == 'geral' else 'background: #f8f9fa; color: #6c757d; border: 2px solid #e9ecef;' }}">
+                🌍 Geral
+            </a>
+            
+            {% if current_turma %}
+            <a href="{{ url_for('ranking', filter='turma') }}" 
+               class="filter-btn {{ 'active' if filter_type == 'turma' else '' }}"
+               style="padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; transition: all 0.3s;
+                      {{ 'background: linear-gradient(135deg, #58cc02 0%, #7dd55c 100%); color: white;' if filter_type == 'turma' else 'background: #f8f9fa; color: #6c757d; border: 2px solid #e9ecef;' }}">
+                🏫 {{ current_turma }}
+            </a>
+            {% endif %}
+        </div>
     </div>
 
     {% if users %}
@@ -114,6 +132,16 @@
         @keyframes glow {
             from { box-shadow: 0 0 5px rgba(88, 204, 2, 0.3); }
             to { box-shadow: 0 0 15px rgba(88, 204, 2, 0.6); }
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .filter-btn:not(.active):hover {
+            background: #e9ecef !important;
+            color: #495057 !important;
         }
     </style>
 {% endblock %}

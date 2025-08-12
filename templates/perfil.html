@@ -6,7 +6,7 @@
         <p style="color: #6c757d; font-size: 16px;">{{ user.turma }}</p>
     </div>
 
-    <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+    <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
         <div class="stat-card" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 20px; border-radius: 16px; text-align: center; color: #333;">
             <div style="font-size: 30px; margin-bottom: 8px;">💰</div>
             <div style="font-size: 24px; font-weight: bold;">{{ user.pontuacao }}</div>
@@ -17,6 +17,12 @@
             <div style="font-size: 30px; margin-bottom: 8px;">🏆</div>
             <div style="font-size: 24px; font-weight: bold;">#{{ rank }}</div>
             <div style="font-size: 14px; opacity: 0.9;">Ranking</div>
+        </div>
+        
+        <div class="stat-card" style="background: linear-gradient(135deg, #58cc02 0%, #7dd55c 100%); padding: 20px; border-radius: 16px; text-align: center; color: white;">
+            <div style="font-size: 30px; margin-bottom: 8px;">📊</div>
+            <div style="font-size: 24px; font-weight: bold;">{{ completion_percentage }}%</div>
+            <div style="font-size: 14px; opacity: 0.9;">{{ answered_questions }}/{{ total_questions }} questões</div>
         </div>
     </div>
 

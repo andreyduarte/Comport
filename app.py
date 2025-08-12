@@ -77,25 +77,7 @@ def migrate_from_json():
 
 def create_teacher_account():
     """Cria contas de administrador e professor se não existirem"""
-    with app.app_context():
-        # Conta administrador
-        admin_username = os.getenv('ADMIN_USERNAME', 'admin')
-        admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
-        admin_turma = os.getenv('ADMIN_TURMA', 'Administrador')
-        
-        if not User.query.get(admin_username):
-            admin = User(
-                username=admin_username,
-                senha=admin_password,
-                turma=admin_turma,
-                pontuacao=0,
-                combo=0,
-                max_combo=0,
-                is_teacher=True
-            )
-            db.session.add(admin)
-            print(f"Conta administrador '{admin_username}' criada com sucesso!")
-        
+    with app.app_context():        
         # Conta professor
         teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
         teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')

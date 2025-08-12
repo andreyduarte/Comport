@@ -1,9 +1,31 @@
 import json
 import random
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
+
+def create_teacher_account():
+    """Cria conta de professor se não existir"""
+    teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
+    teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
+    teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
+    
+    users = load_users()
+    if teacher_username not in users:
+        users[teacher_username] = {
+            'senha': teacher_password,
+            'turma': teacher_turma,
+            'pontuacao': 0,
+            'combo': 0,
+            'correct_questions': [],
+            'answered_questions': [],
+            'achievements': [],
+            'is_teacher': True
+        }
+        save_users(users)
+        print(f"Conta de professor '{teacher_username}' criada com sucesso!")
 
 def load_questions():
     with open('QUESTOES.json', 'r', encoding='utf-8') as f:
@@ -351,4 +373,5 @@ def responder():
                            new_achievements=new_achievements)
 
 if __name__ == '__main__':
+    create_teacher_account()
     app.run(host='0.0.0.0', port=5000, debug=False)

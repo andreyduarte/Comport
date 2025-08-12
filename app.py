@@ -1,62 +1,38 @@
 import json
 import random
 import os
-import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_migrate import Migrate
+from models import db, User, UserQuestion, UserAchievement
 
 # Configuração do banco PostgreSQL
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://quiz_user:quiz_pass@localhost:5432/quiz')
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+migrate = Migrate(app, db)
 
 def init_db():
-    """Inicializa o banco de dados"""
+    """Inicializa o banco de dados com migrações"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        print("Conectado ao PostgreSQL com sucesso!")
-    except psycopg2.Error as e:
-        print(f"Erro ao conectar ao PostgreSQL: {e}")
+        from flask_migrate import upgrade
+        with app.app_context():
+            # Tenta executar migrações primeiro
+            try:
+                upgrade()
+                print("Migrações aplicadas com sucesso!")
+            except Exception:
+                # Se não há migrações, cria tabelas diretamente
+                db.create_all()
+                print("Tabelas criadas com sucesso!")
+            return True
+    except Exception as e:
+        print(f"Erro ao inicializar banco: {e}")
         return False
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            username VARCHAR(50) PRIMARY KEY,
-            senha VARCHAR(255) NOT NULL,
-            turma VARCHAR(100) NOT NULL,
-            pontuacao INTEGER DEFAULT 0,
-            combo INTEGER DEFAULT 0,
-            max_combo INTEGER DEFAULT 0,
-            is_teacher BOOLEAN DEFAULT FALSE
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_questions (
-            id SERIAL PRIMARY KEY,
-            username VARCHAR(50),
-            question_id INTEGER,
-            is_correct BOOLEAN,
-            UNIQUE(username, question_id),
-            FOREIGN KEY (username) REFERENCES users (username)
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_achievements (
-            id SERIAL PRIMARY KEY,
-            username VARCHAR(50),
-            achievement_key VARCHAR(50),
-            UNIQUE(username, achievement_key),
-            FOREIGN KEY (username) REFERENCES users (username)
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
-    print("Tabelas criadas com sucesso!")
-    return True
 
 def migrate_from_json():
     """Migra dados do JSON para PostgreSQL"""
@@ -64,58 +40,46 @@ def migrate_from_json():
         with open('users.json', 'r', encoding='utf-8') as f:
             users_data = json.load(f)
         
-        try:
-            conn = psycopg2.connect(DATABASE_URL)
-            cursor = conn.cursor()
-        except psycopg2.Error as e:
-            print(f"Erro na migração: {e}")
-            return
-        
-        for username, data in users_data.items():
-            cursor.execute('''
-                INSERT INTO users 
-                (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (username) DO UPDATE SET
-                senha = EXCLUDED.senha,
-                turma = EXCLUDED.turma,
-                pontuacao = EXCLUDED.pontuacao,
-                combo = EXCLUDED.combo,
-                max_combo = EXCLUDED.max_combo,
-                is_teacher = EXCLUDED.is_teacher
-            ''', (
-                username,
-                data.get('senha', ''),
-                data.get('turma', ''),
-                data.get('pontuacao', 0),
-                data.get('combo', 0),
-                data.get('max_combo', data.get('combo', 0)),
-                data.get('is_teacher', False)
-            ))
+        with app.app_context():
+            for username, data in users_data.items():
+                # Verifica se usuário já existe
+                user = User.query.get(username)
+                if not user:
+                    user = User(
+                        username=username,
+                        senha=data.get('senha', ''),
+                        turma=data.get('turma', ''),
+                        pontuacao=data.get('pontuacao', 0),
+                        combo=data.get('combo', 0),
+                        max_combo=data.get('max_combo', data.get('combo', 0)),
+                        is_teacher=data.get('is_teacher', False)
+                    )
+                    db.session.add(user)
+                
+                # Migra questões respondidas
+                for q_id in data.get('answered_questions', []):
+                    is_correct = q_id in data.get('correct_questions', [])
+                    existing = UserQuestion.query.filter_by(username=username, question_id=q_id).first()
+                    if not existing:
+                        question = UserQuestion(username=username, question_id=q_id, is_correct=is_correct)
+                        db.session.add(question)
+                
+                # Migra achievements
+                for achievement in data.get('achievements', []):
+                    existing = UserAchievement.query.filter_by(username=username, achievement_key=achievement).first()
+                    if not existing:
+                        ach = UserAchievement(username=username, achievement_key=achievement)
+                        db.session.add(ach)
             
-            # Migra questões respondidas
-            for q_id in data.get('answered_questions', []):
-                is_correct = q_id in data.get('correct_questions', [])
-                cursor.execute('''
-                    INSERT INTO user_questions 
-                    (username, question_id, is_correct) VALUES (%s, %s, %s)
-                    ON CONFLICT (username, question_id) DO NOTHING
-                ''', (username, q_id, is_correct))
-            
-            # Migra achievements
-            for achievement in data.get('achievements', []):
-                cursor.execute('''
-                    INSERT INTO user_achievements 
-                    (username, achievement_key) VALUES (%s, %s)
-                    ON CONFLICT (username, achievement_key) DO NOTHING
-                ''', (username, achievement))
-        
-        conn.commit()
-        conn.close()
-        print("Migração do JSON para PostgreSQL concluída!")
+            db.session.commit()
+            print("Migração do JSON para PostgreSQL concluída!")
         
     except FileNotFoundError:
         print("Arquivo users.json não encontrado, pulando migração.")
+    except Exception as e:
+        print(f"Erro na migração: {e}")
+        with app.app_context():
+            db.session.rollback()
 
 def create_teacher_account():
     """Cria conta de professor se não existir"""
@@ -123,16 +87,20 @@ def create_teacher_account():
     teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
     teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
     
-    if not get_user(teacher_username):
-        save_user(teacher_username, {
-            'senha': teacher_password,
-            'turma': teacher_turma,
-            'pontuacao': 0,
-            'combo': 0,
-            'max_combo': 0,
-            'is_teacher': True
-        })
-        print(f"Conta de professor '{teacher_username}' criada com sucesso!")
+    with app.app_context():
+        if not User.query.get(teacher_username):
+            teacher = User(
+                username=teacher_username,
+                senha=teacher_password,
+                turma=teacher_turma,
+                pontuacao=0,
+                combo=0,
+                max_combo=0,
+                is_teacher=True
+            )
+            db.session.add(teacher)
+            db.session.commit()
+            print(f"Conta de professor '{teacher_username}' criada com sucesso!")
 
 def load_questions():
     with open('QUESTOES.json', 'r', encoding='utf-8') as f:
@@ -231,121 +199,76 @@ def check_new_achievements(user_data, rank=999):
 def get_user(username):
     """Busca um usuário no banco"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
-        user_row = cursor.fetchone()
-        
-        if not user_row:
-            conn.close()
-            return None
-        
-        # Busca questões respondidas (com ORDER BY para consistência)
-        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = %s ORDER BY id', (username,))
-        questions = cursor.fetchall()
-        
-        # Busca achievements (com ORDER BY para consistência)
-        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = %s ORDER BY id', (username,))
-        achievements = [row[0] for row in cursor.fetchall()]
-        
-        conn.close()
-        
-        return {
-            'senha': user_row[1],
-            'turma': user_row[2],
-            'pontuacao': user_row[3],
-            'combo': user_row[4],
-            'max_combo': user_row[5],
-            'is_teacher': bool(user_row[6]),
-            'answered_questions': [q[0] for q in questions],
-            'correct_questions': [q[0] for q in questions if q[1]],
-            'achievements': achievements
-        }
-    except psycopg2.Error as e:
-        print(f"Erro PostgreSQL: {e}")
+        user = User.query.get(username)
+        if user:
+            return user.to_dict()
+        return None
+    except Exception as e:
+        print(f"Erro ao buscar usuário: {e}")
         return None
 
 def save_user(username, user_data):
     """Salva um usuário no banco"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
+        user = User.query.get(username)
+        if user:
+            # Atualiza usuário existente
+            user.senha = user_data.get('senha', user.senha)
+            user.turma = user_data.get('turma', user.turma)
+            user.pontuacao = user_data.get('pontuacao', user.pontuacao)
+            user.combo = user_data.get('combo', user.combo)
+            user.max_combo = user_data.get('max_combo', user.max_combo)
+            user.is_teacher = user_data.get('is_teacher', user.is_teacher)
+        else:
+            # Cria novo usuário
+            user = User(
+                username=username,
+                senha=user_data.get('senha', ''),
+                turma=user_data.get('turma', ''),
+                pontuacao=user_data.get('pontuacao', 0),
+                combo=user_data.get('combo', 0),
+                max_combo=user_data.get('max_combo', 0),
+                is_teacher=user_data.get('is_teacher', False)
+            )
+            db.session.add(user)
         
-        cursor.execute('''
-            INSERT INTO users 
-            (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (username) DO UPDATE SET
-            senha = EXCLUDED.senha,
-            turma = EXCLUDED.turma,
-            pontuacao = EXCLUDED.pontuacao,
-            combo = EXCLUDED.combo,
-            max_combo = EXCLUDED.max_combo,
-            is_teacher = EXCLUDED.is_teacher
-        ''', (
-            username,
-            user_data.get('senha', ''),
-            user_data.get('turma', ''),
-            user_data.get('pontuacao', 0),
-            user_data.get('combo', 0),
-            user_data.get('max_combo', 0),
-            user_data.get('is_teacher', False)
-        ))
-        
-        conn.commit()
-        conn.close()
-    except psycopg2.Error as e:
+        db.session.commit()
+    except Exception as e:
         print(f"Erro ao salvar usuário: {e}")
+        db.session.rollback()
 
 def get_all_users():
     """Busca todos os usuários"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT username, turma, pontuacao FROM users ORDER BY pontuacao DESC')
-        users = cursor.fetchall()
-        
-        conn.close()
-        
-        return [{'nome': u[0], 'turma': u[1], 'pontuacao': u[2]} for u in users]
-    except psycopg2.Error:
+        users = User.query.order_by(User.pontuacao.desc()).all()
+        return [{'nome': u.username, 'turma': u.turma, 'pontuacao': u.pontuacao} for u in users]
+    except Exception as e:
+        print(f"Erro ao buscar usuários: {e}")
         return []
 
 def add_user_question(username, question_id, is_correct):
     """Adiciona uma questão respondida"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            INSERT INTO user_questions 
-            (username, question_id, is_correct) VALUES (%s, %s, %s)
-            ON CONFLICT (username, question_id) DO NOTHING
-        ''', (username, question_id, is_correct))
-        
-        conn.commit()
-        conn.close()
-    except psycopg2.Error as e:
+        existing = UserQuestion.query.filter_by(username=username, question_id=question_id).first()
+        if not existing:
+            question = UserQuestion(username=username, question_id=question_id, is_correct=is_correct)
+            db.session.add(question)
+            db.session.commit()
+    except Exception as e:
         print(f"Erro ao adicionar questão: {e}")
+        db.session.rollback()
 
 def add_user_achievement(username, achievement_key):
     """Adiciona um achievement"""
     try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            INSERT INTO user_achievements 
-            (username, achievement_key) VALUES (%s, %s)
-            ON CONFLICT (username, achievement_key) DO NOTHING
-        ''', (username, achievement_key))
-        
-        conn.commit()
-        conn.close()
-    except psycopg2.Error as e:
+        existing = UserAchievement.query.filter_by(username=username, achievement_key=achievement_key).first()
+        if not existing:
+            achievement = UserAchievement(username=username, achievement_key=achievement_key)
+            db.session.add(achievement)
+            db.session.commit()
+    except Exception as e:
         print(f"Erro ao adicionar achievement: {e}")
+        db.session.rollback()
 
 @app.route('/', methods=['GET', 'POST'])
 def login_register():

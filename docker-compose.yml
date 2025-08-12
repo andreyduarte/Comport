@@ -29,11 +29,16 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://quiz_user:quiz_pass@db:5432/quiz
+      - FLASK_APP=app.py
     depends_on:
       db:
         condition: service_healthy
     networks:
       - quiz-network
+    command: >
+      sh -c "python migrate.py init 2>/dev/null || true &&
+             python migrate.py apply 2>/dev/null || true &&
+             gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 app:app"
 
 volumes:
   quiz_data:

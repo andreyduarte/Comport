@@ -50,7 +50,7 @@ def init_db():
     conn.close()
 
 def migrate_from_json():
-    """Migra dados do JSON para SQLite"""
+    """Migra dados do JSON para PostgreSQL"""
     try:
         with open('users.json', 'r', encoding='utf-8') as f:
             users_data = json.load(f)
@@ -103,7 +103,7 @@ def migrate_from_json():
         
         conn.commit()
         conn.close()
-        print("Migração do JSON para SQLite concluída!")
+        print("Migração do JSON para PostgreSQL concluída!")
         
     except FileNotFoundError:
         print("Arquivo users.json não encontrado, pulando migração.")
@@ -224,10 +224,10 @@ def check_new_achievements(user_data, rank=999):
 def get_user(username):
     """Busca um usuário no banco"""
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
-        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         user_row = cursor.fetchone()
         
         if not user_row:
@@ -235,11 +235,11 @@ def get_user(username):
             return None
         
         # Busca questões respondidas
-        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = ?', (username,))
+        cursor.execute('SELECT question_id, is_correct FROM user_questions WHERE username = %s', (username,))
         questions = cursor.fetchall()
         
         # Busca achievements
-        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = ?', (username,))
+        cursor.execute('SELECT achievement_key FROM user_achievements WHERE username = %s', (username,))
         achievements = [row[0] for row in cursor.fetchall()]
         
         conn.close()
@@ -255,20 +255,27 @@ def get_user(username):
             'correct_questions': [q[0] for q in questions if q[1]],
             'achievements': achievements
         }
-    except sqlite3.OperationalError as e:
-        print(f"Erro SQLite: {e}")
+    except psycopg2.Error as e:
+        print(f"Erro PostgreSQL: {e}")
         return None
 
 def save_user(username, user_data):
     """Salva um usuário no banco"""
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         cursor.execute('''
-            INSERT OR REPLACE INTO users 
+            INSERT INTO users 
             (username, senha, turma, pontuacao, combo, max_combo, is_teacher)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (username) DO UPDATE SET
+            senha = EXCLUDED.senha,
+            turma = EXCLUDED.turma,
+            pontuacao = EXCLUDED.pontuacao,
+            combo = EXCLUDED.combo,
+            max_combo = EXCLUDED.max_combo,
+            is_teacher = EXCLUDED.is_teacher
         ''', (
             username,
             user_data.get('senha', ''),
@@ -281,13 +288,13 @@ def save_user(username, user_data):
         
         conn.commit()
         conn.close()
-    except sqlite3.OperationalError as e:
+    except psycopg2.Error as e:
         print(f"Erro ao salvar usuário: {e}")
 
 def get_all_users():
     """Busca todos os usuários"""
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         cursor.execute('SELECT username, turma, pontuacao FROM users ORDER BY pontuacao DESC')
@@ -296,39 +303,41 @@ def get_all_users():
         conn.close()
         
         return [{'nome': u[0], 'turma': u[1], 'pontuacao': u[2]} for u in users]
-    except sqlite3.OperationalError:
+    except psycopg2.Error:
         return []
 
 def add_user_question(username, question_id, is_correct):
     """Adiciona uma questão respondida"""
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         cursor.execute('''
-            INSERT OR IGNORE INTO user_questions 
-            (username, question_id, is_correct) VALUES (?, ?, ?)
+            INSERT INTO user_questions 
+            (username, question_id, is_correct) VALUES (%s, %s, %s)
+            ON CONFLICT DO NOTHING
         ''', (username, question_id, is_correct))
         
         conn.commit()
         conn.close()
-    except sqlite3.OperationalError as e:
+    except psycopg2.Error as e:
         print(f"Erro ao adicionar questão: {e}")
 
 def add_user_achievement(username, achievement_key):
     """Adiciona um achievement"""
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         cursor.execute('''
-            INSERT OR IGNORE INTO user_achievements 
-            (username, achievement_key) VALUES (?, ?)
+            INSERT INTO user_achievements 
+            (username, achievement_key) VALUES (%s, %s)
+            ON CONFLICT DO NOTHING
         ''', (username, achievement_key))
         
         conn.commit()
         conn.close()
-    except sqlite3.OperationalError as e:
+    except psycopg2.Error as e:
         print(f"Erro ao adicionar achievement: {e}")
 
 @app.route('/', methods=['GET', 'POST'])

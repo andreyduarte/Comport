@@ -1,0 +1,156 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>{% if question %}✏️ Editar Questão #{{ question.id }}{% else %}➕ Nova Questão{% endif %}</h1>
+    <a href="{% if question %}{{ url_for('admin_question_detail', question_id=question.id) }}{% else %}{{ url_for('admin_questoes') }}{% endif %}" 
+       class="btn btn-secondary">← Voltar</a>
+</div>
+
+<form method="POST">
+    <div class="card">
+        <div class="card-header">
+            <h2>📝 Dados da Questão</h2>
+        </div>
+        <div class="card-body">
+            <div style="margin-bottom: 1.5rem;">
+                <label for="pergunta"><strong>Pergunta:</strong></label>
+                <textarea id="pergunta" name="pergunta" required
+                          style="width: 100%; min-height: 100px; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem; resize: vertical;">{{ question.pergunta if question else '' }}</textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label for="opcao_a"><strong>Opção A:</strong></label>
+                    <input type="text" id="opcao_a" name="opcao_a" required
+                           value="{{ question.opcoes.a if question else '' }}"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+                
+                <div>
+                    <label for="opcao_b"><strong>Opção B:</strong></label>
+                    <input type="text" id="opcao_b" name="opcao_b" required
+                           value="{{ question.opcoes.b if question else '' }}"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+                
+                <div>
+                    <label for="opcao_c"><strong>Opção C:</strong></label>
+                    <input type="text" id="opcao_c" name="opcao_c" required
+                           value="{{ question.opcoes.c if question else '' }}"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+                
+                <div>
+                    <label for="opcao_d"><strong>Opção D:</strong></label>
+                    <input type="text" id="opcao_d" name="opcao_d" required
+                           value="{{ question.opcoes.d if question else '' }}"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <label for="resposta_correta"><strong>Resposta Correta:</strong></label>
+                    <select id="resposta_correta" name="resposta_correta" required
+                            style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                        <option value="">Selecione a resposta correta</option>
+                        <option value="a" {% if question and question.resposta_correta == 'a' %}selected{% endif %}>A</option>
+                        <option value="b" {% if question and question.resposta_correta == 'b' %}selected{% endif %}>B</option>
+                        <option value="c" {% if question and question.resposta_correta == 'c' %}selected{% endif %}>C</option>
+                        <option value="d" {% if question and question.resposta_correta == 'd' %}selected{% endif %}>D</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="tema"><strong>Tema:</strong></label>
+                    <input type="text" id="tema" name="tema" required
+                           value="{{ question.get('tema', 'geral') if question else 'geral' }}"
+                           list="temas-list"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                    <datalist id="temas-list">
+                        {% for tema in temas %}
+                            <option value="{{ tema }}">
+                        {% endfor %}
+                        <option value="pavlov">
+                        <option value="watson">
+                        <option value="reflexos">
+                        <option value="processos">
+                        <option value="geral">
+                    </datalist>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>👁️ Pré-visualização</h2>
+        </div>
+        <div class="card-body">
+            <div id="preview" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border: 1px solid #e1e8ed;">
+                <div id="preview-pergunta" style="font-weight: bold; margin-bottom: 1rem; color: #333;">
+                    Digite a pergunta acima para ver a pré-visualização
+                </div>
+                <div id="preview-opcoes">
+                    <div id="preview-a" style="padding: 0.5rem; margin: 0.25rem 0; border-radius: 4px; background: white;">A) Digite a opção A</div>
+                    <div id="preview-b" style="padding: 0.5rem; margin: 0.25rem 0; border-radius: 4px; background: white;">B) Digite a opção B</div>
+                    <div id="preview-c" style="padding: 0.5rem; margin: 0.25rem 0; border-radius: 4px; background: white;">C) Digite a opção C</div>
+                    <div id="preview-d" style="padding: 0.5rem; margin: 0.25rem 0; border-radius: 4px; background: white;">D) Digite a opção D</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+        <button type="submit" class="btn">
+            {% if question %}💾 Salvar Alterações{% else %}➕ Criar Questão{% endif %}
+        </button>
+        <a href="{% if question %}{{ url_for('admin_question_detail', question_id=question.id) }}{% else %}{{ url_for('admin_questoes') }}{% endif %}" 
+           class="btn btn-secondary">❌ Cancelar</a>
+    </div>
+</form>
+
+<script>
+// Pré-visualização em tempo real
+function updatePreview() {
+    const pergunta = document.getElementById('pergunta').value || 'Digite a pergunta acima para ver a pré-visualização';
+    const opcaoA = document.getElementById('opcao_a').value || 'Digite a opção A';
+    const opcaoB = document.getElementById('opcao_b').value || 'Digite a opção B';
+    const opcaoC = document.getElementById('opcao_c').value || 'Digite a opção C';
+    const opcaoD = document.getElementById('opcao_d').value || 'Digite a opção D';
+    const correta = document.getElementById('resposta_correta').value;
+    
+    document.getElementById('preview-pergunta').textContent = pergunta;
+    document.getElementById('preview-a').textContent = 'A) ' + opcaoA;
+    document.getElementById('preview-b').textContent = 'B) ' + opcaoB;
+    document.getElementById('preview-c').textContent = 'C) ' + opcaoC;
+    document.getElementById('preview-d').textContent = 'D) ' + opcaoD;
+    
+    // Destacar resposta correta
+    ['a', 'b', 'c', 'd'].forEach(opcao => {
+        const elemento = document.getElementById('preview-' + opcao);
+        if (opcao === correta) {
+            elemento.style.background = '#d4edda';
+            elemento.style.borderLeft = '4px solid #28a745';
+            elemento.style.fontWeight = 'bold';
+        } else {
+            elemento.style.background = 'white';
+            elemento.style.borderLeft = 'none';
+            elemento.style.fontWeight = 'normal';
+        }
+    });
+}
+
+// Adicionar listeners
+document.getElementById('pergunta').addEventListener('input', updatePreview);
+document.getElementById('opcao_a').addEventListener('input', updatePreview);
+document.getElementById('opcao_b').addEventListener('input', updatePreview);
+document.getElementById('opcao_c').addEventListener('input', updatePreview);
+document.getElementById('opcao_d').addEventListener('input', updatePreview);
+document.getElementById('resposta_correta').addEventListener('change', updatePreview);
+
+// Atualizar preview inicial
+updatePreview();
+</script>
+{% endblock %}

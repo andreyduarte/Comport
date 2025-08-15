@@ -67,6 +67,12 @@
         </form>
     </div>
 
+    {% if session.get('is_teacher') %}
+    <div style="margin: 30px; text-align: center;">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn {{ 'active' if 'admin' in request.endpoint else '' }}">🎓 Área do Professor</a>
+    </div>
+    {% endif %}
+
     <div style="margin-top: 30px; text-align: center;">
         <a href="{{ url_for('logout') }}" class="btn btn-danger">Sair da Conta 🚪</a>
     </div>

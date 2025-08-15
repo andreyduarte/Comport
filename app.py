@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from models import db, User, UserQuestion, UserAchievement, AdminLog
 from admin_utils import admin_required, get_admin_stats, get_student_list, get_all_turmas, log_admin_action
 from datetime import datetime
+import json
 
 # Carrega variáveis do .env
 load_dotenv()
@@ -835,6 +836,116 @@ def admin_question_detail(question_id):
     }
     
     return render_template('admin/question_detail.html', question=question, stats=stats)
+
+@app.route('/admin/questao/nova', methods=['GET', 'POST'])
+@admin_required
+def admin_new_question():
+    if request.method == 'POST':
+        # Criar nova questão
+        new_id = max(q['id'] for q in ALL_QUESTIONS) + 1
+        
+        new_question = {
+            'id': new_id,
+            'pergunta': request.form['pergunta'],
+            'opcoes': {
+                'a': request.form['opcao_a'],
+                'b': request.form['opcao_b'], 
+                'c': request.form['opcao_c'],
+                'd': request.form['opcao_d']
+            },
+            'resposta_correta': request.form['resposta_correta'],
+            'tema': request.form['tema']
+        }
+        
+        # Adicionar à lista
+        ALL_QUESTIONS.append(new_question)
+        
+        # Salvar no arquivo JSON
+        save_questions_to_file()
+        
+        # Log da ação
+        log_admin_action(session['username'], 'create_question', None, {'question_id': new_id})
+        
+        flash(f"Questão #{new_id} criada com sucesso!", "success")
+        return redirect(url_for('admin_question_detail', question_id=new_id))
+    
+    # Temas disponíveis
+    temas = list(set(q.get('tema', 'geral') for q in ALL_QUESTIONS))
+    return render_template('admin/question_form.html', question=None, temas=temas)
+
+@app.route('/admin/questao/<int:question_id>/editar', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_question(question_id):
+    question = next((q for q in ALL_QUESTIONS if q['id'] == question_id), None)
+    if not question:
+        flash("Questão não encontrada!", "error")
+        return redirect(url_for('admin_questoes'))
+    
+    if request.method == 'POST':
+        # Salvar dados antigos para log
+        old_data = question.copy()
+        
+        # Atualizar questão
+        question['pergunta'] = request.form['pergunta']
+        question['opcoes'] = {
+            'a': request.form['opcao_a'],
+            'b': request.form['opcao_b'],
+            'c': request.form['opcao_c'], 
+            'd': request.form['opcao_d']
+        }
+        question['resposta_correta'] = request.form['resposta_correta']
+        question['tema'] = request.form['tema']
+        
+        # Salvar no arquivo JSON
+        save_questions_to_file()
+        
+        # Log da ação
+        log_admin_action(session['username'], 'edit_question', None, {
+            'question_id': question_id,
+            'changes': 'Questão editada'
+        })
+        
+        flash(f"Questão #{question_id} atualizada com sucesso!", "success")
+        return redirect(url_for('admin_question_detail', question_id=question_id))
+    
+    # Temas disponíveis
+    temas = list(set(q.get('tema', 'geral') for q in ALL_QUESTIONS))
+    return render_template('admin/question_form.html', question=question, temas=temas)
+
+@app.route('/admin/questao/<int:question_id>/excluir', methods=['POST'])
+@admin_required
+def admin_delete_question(question_id):
+    question = next((q for q in ALL_QUESTIONS if q['id'] == question_id), None)
+    if not question:
+        flash("Questão não encontrada!", "error")
+        return redirect(url_for('admin_questoes'))
+    
+    # Remover questão
+    ALL_QUESTIONS.remove(question)
+    
+    # Remover respostas dos usuários
+    UserQuestion.query.filter_by(question_id=question_id).delete()
+    db.session.commit()
+    
+    # Salvar arquivo JSON
+    save_questions_to_file()
+    
+    # Log da ação
+    log_admin_action(session['username'], 'delete_question', None, {
+        'question_id': question_id,
+        'pergunta': question['pergunta'][:50] + '...'
+    })
+    
+    flash(f"Questão #{question_id} excluída com sucesso!", "success")
+    return redirect(url_for('admin_questoes'))
+
+def save_questions_to_file():
+    """Salva questões no arquivo JSON"""
+    try:
+        with open('QUESTOES.json', 'w', encoding='utf-8') as f:
+            json.dump(ALL_QUESTIONS, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Erro ao salvar questões: {e}")
 
 if __name__ == '__main__':
     if init_db():

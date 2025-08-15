@@ -56,7 +56,7 @@
                                 {% endif %}
                             </td>
                             <td><span style="color: #dc3545; font-weight: bold;">{{ wrong_count }}</span></td>
-                            <td><a href="{{ url_for('admin_question_detail', question_id=question_id) }}" class="btn btn-secondary">👁️ Ver</a></td>
+                            <td><a href="{{ url_for('admin_question_detail', question_id=question_id) }}" class="btn btn-secondary">👁️</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -98,17 +98,4 @@
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2>🚀 Ações Rápidas</h2>
-    </div>
-    <div class="card-body">
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <a href="{{ url_for('admin_alunos') }}" class="btn">👥 Ver Todos os Alunos</a>
-            <a href="{{ url_for('admin_analytics') }}" class="btn">📈 Analytics Detalhados</a>
-            <a href="{{ url_for('admin_logs') }}" class="btn btn-secondary">📋 Ver Logs</a>
-            <a href="{{ url_for('admin_export') }}" class="btn btn-secondary">📤 Exportar Dados</a>
-        </div>
-    </div>
-</div>
 {% endblock %}

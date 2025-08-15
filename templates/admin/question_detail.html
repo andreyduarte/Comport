@@ -87,8 +87,8 @@
             </div>
             <div class="card-body">
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <button class="btn btn-secondary">✏️ Editar Questão</button>
-                    <button class="btn btn-danger">🗑️ Excluir Questão</button>
+                    <a href="{{ url_for('admin_edit_question', question_id=question.id) }}" class="btn btn-secondary">✏️ Editar Questão</a>
+                    <button class="btn btn-danger" onclick="deleteQuestion()">🗑️ Excluir Questão</button>
                     <button class="btn btn-secondary">📊 Ver Relatório</button>
                 </div>
             </div>
@@ -130,4 +130,15 @@
     </div>
 </div>
 {% endif %}
+<script>
+function deleteQuestion() {
+    if (confirm('⚠️ ATENÇÃO: Tem certeza que deseja excluir esta questão?\n\nEsta ação irá:\n- Remover a questão permanentemente\n- Apagar todas as respostas dos alunos\n- NÃO PODE ser desfeita!\n\nQuestão: {{ question.pergunta[:50] }}...')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin_delete_question", question_id=question.id) }}';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
 {% endblock %}

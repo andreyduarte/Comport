@@ -259,9 +259,6 @@
                 <a href="{{ url_for('jogar') }}" class="nav-tab {{ 'active' if request.endpoint == 'jogar' else '' }}">🎯 Jogar</a>
                 <a href="{{ url_for('perfil') }}" class="nav-tab {{ 'active' if request.endpoint == 'perfil' else '' }}">👤 Perfil</a>
                 <a href="{{ url_for('ranking') }}" class="nav-tab {{ 'active' if request.endpoint == 'ranking' else '' }}">🏆 Ranking</a>
-                {% if session.get('is_teacher') %}
-                    <a href="{{ url_for('admin_dashboard') }}" class="nav-tab {{ 'active' if 'admin' in request.endpoint else '' }}">🎓 Admin</a>
-                {% endif %}
             </div>
         {% endif %}
         

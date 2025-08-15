@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Serviço de backup automático
+  backup:
+    build: .
+    container_name: psicoquiz_backup
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://quiz_user:quiz_pass@db:5432/quiz
+    volumes:
+      - ./backups:/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock  # Para executar comandos docker
+    depends_on:
+      - db
+    networks:
+      - quiz-network
+    command: python auto_backup.py
+    
+  # Serviço adicional para backups sob demanda
+  backup-tools:
+    build: .
+    container_name: psicoquiz_backup_tools
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://quiz_user:quiz_pass@db:5432/quiz
+    volumes:
+      - ./backups:/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - db
+    networks:
+      - quiz-network
+    profiles:
+      - tools  # Só inicia quando solicitado
+    command: tail -f /dev/null  # Mantém container ativo
+
+networks:
+  quiz-network:
+    external: true

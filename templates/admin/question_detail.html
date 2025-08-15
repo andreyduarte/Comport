@@ -1,0 +1,133 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>❓ Questão #{{ question.id }}</h1>
+    <a href="{{ url_for('admin_questoes') }}" class="btn btn-secondary">← Voltar para Questões</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>📝 Conteúdo da Questão</h2>
+        </div>
+        <div class="card-body">
+            <div style="margin-bottom: 1.5rem;">
+                <strong>Pergunta:</strong>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                    {{ question.pergunta }}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <strong>Opções de Resposta:</strong>
+                <div style="margin-top: 0.5rem;">
+                    {% for key, value in question.opcoes.items() %}
+                    <div style="padding: 0.75rem; margin: 0.5rem 0; border-radius: 8px; 
+                                {% if key == question.resposta_correta %}
+                                    background: #d4edda; border-left: 4px solid #28a745;
+                                {% else %}
+                                    background: #f8f9fa; border-left: 4px solid #e1e8ed;
+                                {% endif %}">
+                        <strong>{{ key.upper() }})</strong> {{ value }}
+                        {% if key == question.resposta_correta %}
+                            <span style="color: #28a745; font-weight: bold; float: right;">✓ Correta</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
+                <strong>Tema:</strong>
+                <span style="background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.9rem;">
+                    {{ question.get('tema', 'geral').title() }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2>📊 Estatísticas</h2>
+            </div>
+            <div class="card-body">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 3rem; font-weight: bold; 
+                                {% if stats.accuracy >= 70 %}color: #28a745;
+                                {% elif stats.accuracy >= 50 %}color: #ffc107;
+                                {% else %}color: #dc3545;{% endif %}">
+                        {{ "%.1f"|format(stats.accuracy) }}%
+                    </div>
+                    <div style="color: #657786;">Taxa de Acerto</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;">{{ stats.correct_answers }}</div>
+                        <div style="font-size: 0.8rem; color: #657786;">Acertos</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #dc3545;">{{ stats.wrong_answers }}</div>
+                        <div style="font-size: 0.8rem; color: #657786;">Erros</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">{{ stats.total_answers }}</div>
+                    <div style="font-size: 0.8rem; color: #657786;">Total de Respostas</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>⚙️ Ações</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button class="btn btn-secondary">✏️ Editar Questão</button>
+                    <button class="btn btn-danger">🗑️ Excluir Questão</button>
+                    <button class="btn btn-secondary">📊 Ver Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if stats.wrong_users %}
+<div class="card">
+    <div class="card-header">
+        <h2>👥 Alunos que Erraram ({{ stats.wrong_users|length }})</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            {% for username in stats.wrong_users %}
+            <a href="{{ url_for('admin_aluno_detail', username=username) }}" 
+               style="background: #f8d7da; color: #721c24; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; font-size: 0.9rem;">
+                {{ username }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        {% if stats.accuracy < 50 %}
+        <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+            <strong>💡 Sugestão Pedagógica:</strong> Esta questão tem alta taxa de erro ({{ "%.1f"|format(100 - stats.accuracy) }}%). 
+            Considere revisar este tópico em aula ou reformular a questão para maior clareza.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if stats.total_answers == 0 %}
+<div class="card">
+    <div class="card-body" style="text-align: center; color: #657786;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">❓</div>
+        <h3>Questão ainda não foi respondida</h3>
+        <p>Esta questão ainda não foi apresentada a nenhum aluno.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

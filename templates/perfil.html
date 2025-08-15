@@ -54,6 +54,7 @@
             <select name="turma" id="turma" style="width: 100%; padding: 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; margin: 8px 0; background: white;">
                 <option value="{{ user.turma }}" selected>{{ user.turma }}</option>
                 {% if user.turma != 'Manhã' %}<option value="Manhã">Manhã</option>{% endif %}
+                {% if user.turma != 'Psicoterapia' %}<option value="Psicoterapia">Psicoterapia</option>{% endif %}
                 {% if user.turma != 'Noite - Sexta' %}<option value="Noite - Sexta">Noite - Sexta</option>{% endif %}
                 {% if user.turma != 'Noite - Quarta' %}<option value="Noite - Quarta">Noite - Quarta</option>{% endif %}
                 {% if user.turma == 'Professor' %}<option value="Professor">Professor</option>{% endif %}

@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>👤 Perfil de {{ username }}</h1>
+    <a href="{{ url_for('admin_alunos') }}" class="btn btn-secondary">← Voltar para Alunos</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>📊 Estatísticas Gerais</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <strong>Pontuação Total:</strong><br>
+                    <span style="font-size: 1.5rem; color: #667eea;">{{ user.pontuacao }} pts</span>
+                </div>
+                <div>
+                    <strong>Posição no Ranking:</strong><br>
+                    <span style="font-size: 1.5rem; color: #667eea;">{{ rank }}º lugar</span>
+                </div>
+                <div>
+                    <strong>Turma:</strong><br>
+                    {{ user.turma }}
+                </div>
+                <div>
+                    <strong>Combo Máximo:</strong><br>
+                    {{ user.max_combo }}x
+                </div>
+                <div>
+                    <strong>Questões Respondidas:</strong><br>
+                    {{ user.answered_questions|length }}
+                </div>
+                <div>
+                    <strong>Questões Corretas:</strong><br>
+                    {{ user.correct_questions|length }}
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <strong>Taxa de Acerto:</strong><br>
+                {% set accuracy = (user.correct_questions|length / user.answered_questions|length * 100) if user.answered_questions|length > 0 else 0 %}
+                <div style="background: #f0f2f5; border-radius: 10px; padding: 0.5rem; margin-top: 0.5rem;">
+                    <div style="background: #667eea; height: 20px; border-radius: 10px; width: {{ accuracy }}%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
+                        {{ "%.1f"|format(accuracy) }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>🏆 Conquistas</h2>
+        </div>
+        <div class="card-body">
+            {% if achievements %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    {% for key, achievement in achievements.items() %}
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #e1e8ed;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">{{ achievement.icon }}</div>
+                        <div style="font-weight: bold; margin-bottom: 0.25rem;">{{ achievement.name }}</div>
+                        <div style="font-size: 0.8rem; color: #657786;">{{ achievement.desc }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; color: #657786; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                    <p>Nenhuma conquista desbloqueada ainda.</p>
+                    <p>Continue respondendo questões para ganhar badges!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>⚙️ Ações Administrativas</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="editUser()">✏️ Editar Dados</button>
+            <button class="btn btn-danger" onclick="resetProgress()">🔄 Resetar Progresso</button>
+            <button class="btn btn-secondary" onclick="adjustScore()">📊 Ajustar Pontuação</button>
+            <a href="{{ url_for('ver_usuario', username=username) }}" class="btn">👁️ Ver como Aluno</a>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+            <strong>⚠️ Atenção:</strong> Ações administrativas são registradas em logs para auditoria.
+        </div>
+    </div>
+</div>
+
+<script>
+function editUser() {
+    window.location.href = '{{ url_for("admin_edit_user", username=username) }}';
+}
+
+function resetProgress() {
+    if (confirm('⚠️ ATENÇÃO: Tem certeza que deseja resetar TODO o progresso de {{ username }}?\n\nEsta ação irá:\n- Zerar pontuação\n- Remover todas as questões respondidas\n- Remover todas as conquistas\n\nEsta ação NÃO PODE ser desfeita!')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin_reset_progress", username=username) }}';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function adjustScore() {
+    const currentScore = {{ user.pontuacao }};
+    const newScore = prompt('Digite a nova pontuação para {{ username }}:', currentScore);
+    
+    if (newScore !== null && !isNaN(newScore) && newScore.trim() !== '') {
+        const score = parseInt(newScore);
+        if (score >= 0) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("admin_adjust_score", username=username) }}';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'new_score';
+            input.value = score;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        } else {
+            alert('A pontuação deve ser um número positivo!');
+        }
+    }
+}
+</script>
+{% endblock %}

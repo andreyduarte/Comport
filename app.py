@@ -1,9 +1,15 @@
 import json
 import random
 import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_migrate import Migrate
-from models import db, User, UserQuestion, UserAchievement
+from models import db, User, UserQuestion, UserAchievement, AdminLog
+from admin_utils import admin_required, get_admin_stats, get_student_list, get_all_turmas, log_admin_action
+from datetime import datetime
+
+# Carrega variáveis do .env
+load_dotenv()
 
 # Configuração do banco PostgreSQL
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://quiz_user:quiz_pass@localhost:5432/quiz')
@@ -77,26 +83,40 @@ def migrate_from_json():
 
 def create_teacher_account():
     """Cria contas de administrador e professor se não existirem"""
-    with app.app_context():        
-        # Conta professor
-        teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
-        teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
-        teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
-        
-        if not User.query.get(teacher_username):
-            teacher = User(
-                username=teacher_username,
-                senha=teacher_password,
-                turma=teacher_turma,
-                pontuacao=0,
-                combo=0,
-                max_combo=0,
-                is_teacher=True
-            )
-            db.session.add(teacher)
-            print(f"Conta professor '{teacher_username}' criada com sucesso!")
-        
-        db.session.commit()
+    with app.app_context():
+        try:
+            # Conta professor
+            teacher_username = os.getenv('TEACHER_USERNAME', 'professor')
+            teacher_password = os.getenv('TEACHER_PASSWORD', 'admin123')
+            teacher_turma = os.getenv('TEACHER_TURMA', 'Docente')
+            
+            print(f"Verificando conta professor: {teacher_username}")
+            
+            existing_teacher = User.query.get(teacher_username)
+            if not existing_teacher:
+                teacher = User(
+                    username=teacher_username,
+                    senha=teacher_password,
+                    turma=teacher_turma,
+                    pontuacao=0,
+                    combo=0,
+                    max_combo=0,
+                    is_teacher=True
+                )
+                db.session.add(teacher)
+                db.session.commit()
+                print(f"✅ Conta professor '{teacher_username}' criada com sucesso!")
+            else:
+                print(f"ℹ️ Conta professor '{teacher_username}' já existe")
+                # Garante que a conta existente seja professor
+                if not existing_teacher.is_teacher:
+                    existing_teacher.is_teacher = True
+                    db.session.commit()
+                    print(f"✅ Conta '{teacher_username}' atualizada para professor")
+                    
+        except Exception as e:
+            print(f"❌ Erro ao criar conta professor: {e}")
+            db.session.rollback()
 
 def load_questions():
     with open('QUESTOES.json', 'r', encoding='utf-8') as f:
@@ -304,7 +324,12 @@ def login_register():
                 session['username'] = username
                 session['pontuacao'] = user['pontuacao']
                 session['combo'] = user.get('combo', 0)
+                session['is_teacher'] = user.get('is_teacher', False)
                 session.pop('answered_ids', None)
+                
+                # Redireciona professor para dashboard
+                if user.get('is_teacher'):
+                    return redirect(url_for('admin_dashboard'))
                 return redirect(url_for('perfil'))
             else:
                 flash("Nome de usuário ou senha incorretos. 😅", "error")
@@ -535,6 +560,281 @@ def responder():
                            correct_answer=correct_option_text,
                            question=question,
                            new_achievements=new_achievements)
+
+# --- Rotas Administrativas ---
+
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+    stats = get_admin_stats()
+    return render_template('admin/dashboard.html', stats=stats)
+
+@app.route('/admin/alunos')
+@admin_required
+def admin_alunos():
+    turma_filter = request.args.get('turma')
+    search = request.args.get('search')
+    page = request.args.get('page', 1, type=int)
+    
+    students = get_student_list(turma_filter, search, page)
+    turmas = get_all_turmas()
+    
+    return render_template('admin/alunos.html', 
+                         students=students, 
+                         turmas=turmas,
+                         current_turma=turma_filter,
+                         current_search=search)
+
+@app.route('/admin/analytics')
+@admin_required
+def admin_analytics():
+    stats = get_admin_stats()
+    return render_template('admin/analytics.html', stats=stats)
+
+@app.route('/admin/aluno/<username>')
+@admin_required
+def admin_aluno_detail(username):
+    user_data = get_user(username)
+    if not user_data:
+        flash("Aluno não encontrado!", "error")
+        return redirect(url_for('admin_alunos'))
+    
+    # Calcula ranking
+    all_users = get_all_users()
+    user_rank = next((i+1 for i, u in enumerate(all_users) if u['nome'] == username), -1)
+    
+    achievements = get_achievements()
+    user_achievements = {key: achievements[key] for key in user_data.get('achievements', []) if key in achievements}
+    
+    return render_template('admin/aluno_detail.html', 
+                         user=user_data, 
+                         rank=user_rank, 
+                         username=username, 
+                         achievements=user_achievements)
+
+@app.route('/admin/edit-user/<username>', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_user(username):
+    user_data = get_user(username)
+    if not user_data:
+        flash("Aluno não encontrado!", "error")
+        return redirect(url_for('admin_alunos'))
+    
+    if request.method == 'POST':
+        # Log da ação
+        log_admin_action(session['username'], 'edit_user', username, request.form.to_dict())
+        
+        # Atualiza dados
+        user_data['turma'] = request.form.get('turma', user_data['turma'])
+        user_data['pontuacao'] = int(request.form.get('pontuacao', user_data['pontuacao']))
+        
+        nova_senha = request.form.get('senha')
+        if nova_senha:
+            user_data['senha'] = nova_senha
+        
+        save_user(username, user_data)
+        flash(f"Dados de {username} atualizados com sucesso!", "success")
+        return redirect(url_for('admin_aluno_detail', username=username))
+    
+    return render_template('admin/edit_user.html', user=user_data, username=username)
+
+@app.route('/admin/reset-progress/<username>', methods=['POST'])
+@admin_required
+def admin_reset_progress(username):
+    user_data = get_user(username)
+    if not user_data:
+        flash("Aluno não encontrado!", "error")
+        return redirect(url_for('admin_alunos'))
+    
+    # Log da ação
+    log_admin_action(session['username'], 'reset_progress', username, {'old_score': user_data['pontuacao']})
+    
+    # Reset completo
+    UserQuestion.query.filter_by(username=username).delete()
+    UserAchievement.query.filter_by(username=username).delete()
+    
+    user_data['pontuacao'] = 0
+    user_data['combo'] = 0
+    user_data['max_combo'] = 0
+    
+    save_user(username, user_data)
+    db.session.commit()
+    
+    flash(f"Progresso de {username} resetado com sucesso!", "success")
+    return redirect(url_for('admin_aluno_detail', username=username))
+
+@app.route('/admin/adjust-score/<username>', methods=['POST'])
+@admin_required
+def admin_adjust_score(username):
+    user_data = get_user(username)
+    if not user_data:
+        flash("Aluno não encontrado!", "error")
+        return redirect(url_for('admin_alunos'))
+    
+    new_score = request.form.get('new_score')
+    if not new_score or not new_score.isdigit():
+        flash("Pontuação inválida!", "error")
+        return redirect(url_for('admin_aluno_detail', username=username))
+    
+    old_score = user_data['pontuacao']
+    new_score = int(new_score)
+    
+    # Log da ação
+    log_admin_action(session['username'], 'adjust_score', username, {'old_score': old_score, 'new_score': new_score})
+    
+    user_data['pontuacao'] = new_score
+    save_user(username, user_data)
+    
+    flash(f"Pontuação de {username} ajustada de {old_score} para {new_score} pontos!", "success")
+    return redirect(url_for('admin_aluno_detail', username=username))
+
+@app.route('/admin/logs')
+@admin_required
+def admin_logs():
+    page = request.args.get('page', 1, type=int)
+    logs = AdminLog.query.order_by(AdminLog.timestamp.desc()).paginate(
+        page=page, per_page=50, error_out=False
+    )
+    return render_template('admin/logs.html', logs=logs)
+
+@app.route('/admin/export')
+@admin_required
+def admin_export():
+    import csv
+    import io
+    from flask import make_response
+    
+    # Criar CSV em memória
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Cabeçalho
+    writer.writerow(['Username', 'Turma', 'Pontuação', 'Questões_Respondidas', 'Questões_Corretas', 'Taxa_Acerto', 'Combo_Max'])
+    
+    # Dados dos alunos
+    users = User.query.filter_by(is_teacher=False).all()
+    for user in users:
+        user_dict = user.to_dict()
+        answered = len(user_dict.get('answered_questions', []))
+        correct = len(user_dict.get('correct_questions', []))
+        accuracy = (correct / answered * 100) if answered > 0 else 0
+        
+        writer.writerow([
+            user.username,
+            user.turma,
+            user.pontuacao,
+            answered,
+            correct,
+            f"{accuracy:.1f}%",
+            user.max_combo
+        ])
+    
+    # Preparar resposta
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f'attachment; filename=relatorio_alunos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+    
+    # Log da ação
+    log_admin_action(session['username'], 'export_data', None, {'total_users': len(users)})
+    
+    return response
+
+@app.route('/admin/questoes')
+@admin_required
+def admin_questoes():
+    tema_filter = request.args.get('tema')
+    search = request.args.get('search')
+    sort_by = request.args.get('sort', 'id')
+    sort_order = request.args.get('order', 'asc')
+    page = request.args.get('page', 1, type=int)
+    
+    questions = ALL_QUESTIONS.copy()
+    
+    # Filtros
+    if tema_filter:
+        questions = [q for q in questions if q.get('tema') == tema_filter]
+    
+    if search:
+        questions = [q for q in questions if search.lower() in q['pergunta'].lower()]
+    
+    # Estatísticas de erro para todas as questões (para ordenação)
+    error_stats = {}
+    for q in questions:
+        error_count = UserQuestion.query.filter_by(question_id=q['id'], is_correct=False).count()
+        total_answers = UserQuestion.query.filter_by(question_id=q['id']).count()
+        error_rate = (error_count / total_answers * 100) if total_answers > 0 else 0
+        error_stats[q['id']] = {'errors': error_count, 'total': total_answers, 'error_rate': error_rate}
+    
+    # Ordenação
+    reverse = sort_order == 'desc'
+    if sort_by == 'tema':
+        questions.sort(key=lambda x: x.get('tema', 'geral'), reverse=reverse)
+    elif sort_by == 'respostas':
+        questions.sort(key=lambda x: error_stats[x['id']]['total'], reverse=reverse)
+    elif sort_by == 'erro':
+        questions.sort(key=lambda x: error_stats[x['id']]['error_rate'], reverse=reverse)
+    else:  # id
+        questions.sort(key=lambda x: x['id'], reverse=reverse)
+    
+    # Paginação manual
+    per_page = 20
+    total = len(questions)
+    start = (page - 1) * per_page
+    end = start + per_page
+    questions_page = questions[start:end]
+    
+    # Temas disponíveis
+    temas = list(set(q.get('tema', 'geral') for q in ALL_QUESTIONS))
+    
+    pagination = {
+        'page': page,
+        'pages': (total + per_page - 1) // per_page,
+        'total': total,
+        'has_prev': page > 1,
+        'has_next': end < total,
+        'prev_num': page - 1 if page > 1 else None,
+        'next_num': page + 1 if end < total else None
+    }
+    
+    return render_template('admin/questoes.html', 
+                         questions=questions_page,
+                         error_stats=error_stats,
+                         temas=temas,
+                         current_tema=tema_filter,
+                         current_search=search,
+                         current_sort=sort_by,
+                         current_order=sort_order,
+                         pagination=pagination)
+
+@app.route('/admin/questao/<int:question_id>')
+@admin_required
+def admin_question_detail(question_id):
+    question = next((q for q in ALL_QUESTIONS if q['id'] == question_id), None)
+    if not question:
+        flash("Questão não encontrada!", "error")
+        return redirect(url_for('admin_questoes'))
+    
+    # Estatísticas da questão
+    total_answers = UserQuestion.query.filter_by(question_id=question_id).count()
+    correct_answers = UserQuestion.query.filter_by(question_id=question_id, is_correct=True).count()
+    wrong_answers = total_answers - correct_answers
+    accuracy = (correct_answers / total_answers * 100) if total_answers > 0 else 0
+    
+    # Usuários que erraram
+    wrong_users = db.session.query(UserQuestion.username).filter_by(
+        question_id=question_id, is_correct=False
+    ).all()
+    
+    stats = {
+        'total_answers': total_answers,
+        'correct_answers': correct_answers,
+        'wrong_answers': wrong_answers,
+        'accuracy': accuracy,
+        'wrong_users': [u[0] for u in wrong_users]
+    }
+    
+    return render_template('admin/question_detail.html', question=question, stats=stats)
 
 if __name__ == '__main__':
     if init_db():

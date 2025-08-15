@@ -1,0 +1,122 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>📋 Logs de Auditoria</h1>
+    <a href="{{ url_for('admin_export') }}" class="btn">📤 Exportar Relatório</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>🔍 Histórico de Ações Administrativas</h2>
+    </div>
+    <div class="card-body">
+        {% if logs.items %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Admin</th>
+                            <th>Ação</th>
+                            <th>Aluno</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs.items %}
+                        <tr>
+                            <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                            <td><strong>{{ log.admin_username }}</strong></td>
+                            <td>
+                                {% if log.action == 'edit_user' %}
+                                    <span style="color: #007bff;">✏️ Editar Dados</span>
+                                {% elif log.action == 'reset_progress' %}
+                                    <span style="color: #dc3545;">🔄 Reset Progresso</span>
+                                {% elif log.action == 'adjust_score' %}
+                                    <span style="color: #28a745;">📊 Ajustar Pontuação</span>
+                                {% elif log.action == 'export_data' %}
+                                    <span style="color: #6f42c1;">📤 Exportar Dados</span>
+                                {% else %}
+                                    {{ log.action }}
+                                {% endif %}
+                            </td>
+                            <td>{{ log.target_username or '-' }}</td>
+                            <td>
+                                {% if log.details %}
+                                    <small style="color: #657786;">{{ log.details }}</small>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if logs.pages > 1 %}
+            <div style="margin-top: 1.5rem; text-align: center;">
+                {% if logs.has_prev %}
+                    <a href="{{ url_for('admin_logs', page=logs.prev_num) }}" class="btn btn-secondary">← Anterior</a>
+                {% endif %}
+                
+                <span style="margin: 0 1rem;">
+                    Página {{ logs.page }} de {{ logs.pages }} ({{ logs.total }} registros)
+                </span>
+                
+                {% if logs.has_next %}
+                    <a href="{{ url_for('admin_logs', page=logs.next_num) }}" class="btn btn-secondary">Próxima →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: #657786;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                <h3>Nenhum log encontrado</h3>
+                <p>As ações administrativas aparecerão aqui quando realizadas.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>ℹ️ Informações sobre Logs</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div>
+                <strong>🔍 O que é registrado:</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Edições de dados de alunos</li>
+                    <li>Reset de progresso</li>
+                    <li>Ajustes de pontuação</li>
+                    <li>Exportações de relatórios</li>
+                </ul>
+            </div>
+            
+            <div>
+                <strong>📊 Dados armazenados:</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Data e hora da ação</li>
+                    <li>Professor responsável</li>
+                    <li>Aluno afetado</li>
+                    <li>Detalhes da alteração</li>
+                </ul>
+            </div>
+            
+            <div>
+                <strong>🛡️ Segurança:</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Logs não podem ser editados</li>
+                    <li>Rastreabilidade completa</li>
+                    <li>Auditoria transparente</li>
+                    <li>Backup automático</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

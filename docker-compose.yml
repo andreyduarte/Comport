@@ -36,7 +36,7 @@ services:
     networks:
       - quiz-network
     command: >
-      sh -c "python -c 'from app import init_db; init_db()' &&
+      sh -c "python init_app.py &&
              gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 app:app"
 
 volumes:

@@ -1,0 +1,132 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1>📈 Analytics Detalhados</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Engajamento Geral</h3>
+        <div class="number">{{ "%.1f"|format((stats.active_students / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</div>
+        <div class="change">📊 Taxa de participação</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Média de Questões</h3>
+        <div class="number">{{ "%.1f"|format((stats.total_questions_answered / stats.active_students) if stats.active_students > 0 else 0) }}</div>
+        <div class="change">📝 Por aluno ativo</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Questões Problemáticas</h3>
+        <div class="number">{{ stats.wrong_questions|length }}</div>
+        <div class="change">⚠️ Com alta taxa de erro</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Turmas Ativas</h3>
+        <div class="number">{{ stats.turma_stats|length }}</div>
+        <div class="change">🏫 Participando</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>🎯 Top 10 Questões Mais Difíceis</h2>
+        </div>
+        <div class="card-body">
+            {% if stats.wrong_questions %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for question_id, wrong_count in stats.wrong_questions %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #e1e8ed;">
+                        <div>
+                            <strong>Questão #{{ question_id }}</strong><br>
+                            <small style="color: #657786;">{{ wrong_count }} respostas incorretas</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">
+                                {{ wrong_count }} erros
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                    <strong>💡 Dica Pedagógica:</strong> Questões com muitos erros podem indicar conceitos que precisam ser revisados em aula.
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: #657786;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                    <p>Ainda não há dados suficientes para análise.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>🏆 Ranking de Turmas</h2>
+        </div>
+        <div class="card-body">
+            {% if stats.turma_stats %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for turma, count, avg_score in stats.turma_stats|sort(attribute=2, reverse=true) %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #e1e8ed;">
+                        <div>
+                            <strong>{{ turma }}</strong><br>
+                            <small style="color: #657786;">{{ count }} aluno{{ 's' if count != 1 else '' }}</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #667eea;">
+                                {{ "%.1f"|format(avg_score or 0) }} pts
+                            </div>
+                            <small style="color: #657786;">média</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                    <strong>📈 Insight:</strong> Compare o desempenho entre turmas para identificar padrões de aprendizagem.
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: #657786;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏫</div>
+                    <p>Nenhuma turma com dados ainda.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>📋 Relatórios Disponíveis</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div style="border: 1px solid #e1e8ed; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                <h3>Relatório de Desempenho</h3>
+                <p style="color: #657786; margin: 1rem 0;">Análise completa por aluno e turma</p>
+                <button class="btn btn-secondary" onclick="alert('Em desenvolvimento')">📥 Gerar</button>
+            </div>
+            
+            <div style="border: 1px solid #e1e8ed; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📈</div>
+                <h3>Evolução Temporal</h3>
+                <p style="color: #657786; margin: 1rem 0;">Progresso dos alunos ao longo do tempo</p>
+                <button class="btn btn-secondary" onclick="alert('Em desenvolvimento')">📥 Gerar</button>
+            </div>
+            
+            <div style="border: 1px solid #e1e8ed; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🎯</div>
+                <h3>Análise de Questões</h3>
+                <p style="color: #657786; margin: 1rem 0;">Dificuldade e padrões de erro</p>
+                <button class="btn btn-secondary" onclick="alert('Em desenvolvimento')">📥 Gerar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

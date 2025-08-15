@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>👥 Gestão de Alunos</h2>
+    </div>
+    <div class="card-body">
+        <div class="search-bar">
+            <form method="GET" style="display: flex; gap: 1rem; width: 100%; align-items: center;">
+                <input type="text" name="search" placeholder="Buscar por nome..." value="{{ current_search or '' }}">
+                <select name="turma">
+                    <option value="">Todas as turmas</option>
+                    {% for turma_tuple in turmas %}
+                        <option value="{{ turma_tuple[0] }}" {% if current_turma == turma_tuple[0] %}selected{% endif %}>
+                            {{ turma_tuple[0] }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn">🔍 Filtrar</button>
+                <a href="{{ url_for('admin_alunos') }}" class="btn btn-secondary">🔄 Limpar</a>
+            </form>
+        </div>
+        
+        {% if students.items %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Turma</th>
+                        <th>Pontuação</th>
+                        <th>Questões</th>
+                        <th>Combo Max</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students.items %}
+                    <tr>
+                        <td><strong>{{ student.username }}</strong></td>
+                        <td>{{ student.turma }}</td>
+                        <td>{{ student.pontuacao }} pts</td>
+                        <td>{{ student.questions|length }} respondidas</td>
+                        <td>{{ student.max_combo }}x</td>
+                        <td>
+                            <a href="{{ url_for('admin_aluno_detail', username=student.username) }}" class="btn btn-secondary">👁️ Ver</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Paginação -->
+            {% if students.pages > 1 %}
+            <div style="margin-top: 1.5rem; text-align: center;">
+                {% if students.has_prev %}
+                    <a href="{{ url_for('admin_alunos', page=students.prev_num, turma=current_turma, search=current_search) }}" class="btn btn-secondary">← Anterior</a>
+                {% endif %}
+                
+                <span style="margin: 0 1rem;">
+                    Página {{ students.page }} de {{ students.pages }} ({{ students.total }} alunos)
+                </span>
+                
+                {% if students.has_next %}
+                    <a href="{{ url_for('admin_alunos', page=students.next_num, turma=current_turma, search=current_search) }}" class="btn btn-secondary">Próxima →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: #657786;">
+                <h3>📭 Nenhum aluno encontrado</h3>
+                <p>Tente ajustar os filtros ou verifique se há alunos cadastrados.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

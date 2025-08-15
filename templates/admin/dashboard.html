@@ -1,0 +1,114 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total de Alunos</h3>
+        <div class="number">{{ stats.total_students }}</div>
+        <div class="change">📚 Cadastrados</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Alunos Ativos</h3>
+        <div class="number">{{ stats.active_students }}</div>
+        <div class="change">🎯 Com pontuação</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Questões Respondidas</h3>
+        <div class="number">{{ stats.total_questions_answered }}</div>
+        <div class="change">✅ Total geral</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Taxa de Engajamento</h3>
+        <div class="number">{{ "%.1f"|format((stats.active_students / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</div>
+        <div class="change">📈 Alunos participando</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>🎯 Questões Mais Difíceis</h2>
+        </div>
+        <div class="card-body">
+            {% if stats.wrong_questions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pergunta</th>
+                            <th>Erros</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question_id, wrong_count in stats.wrong_questions %}
+                        {% set question = stats.questions_dict.get(question_id) %}
+                        <tr>
+                            <td>{{ question_id }}</td>
+                            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {% if question %}
+                                    {{ question.pergunta[:60] }}{% if question.pergunta|length > 60 %}...{% endif %}
+                                {% else %}
+                                    Questão não encontrada
+                                {% endif %}
+                            </td>
+                            <td><span style="color: #dc3545; font-weight: bold;">{{ wrong_count }}</span></td>
+                            <td><a href="{{ url_for('admin_question_detail', question_id=question_id) }}" class="btn btn-secondary">👁️ Ver</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Nenhuma questão respondida ainda.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>📊 Desempenho por Turma</h2>
+        </div>
+        <div class="card-body">
+            {% if stats.turma_stats %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Turma</th>
+                            <th>Alunos</th>
+                            <th>Média</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma, count, avg_score in stats.turma_stats %}
+                        <tr>
+                            <td>{{ turma }}</td>
+                            <td>{{ count }}</td>
+                            <td>{{ "%.1f"|format(avg_score or 0) }} pts</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Nenhuma turma cadastrada ainda.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>🚀 Ações Rápidas</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('admin_alunos') }}" class="btn">👥 Ver Todos os Alunos</a>
+            <a href="{{ url_for('admin_analytics') }}" class="btn">📈 Analytics Detalhados</a>
+            <a href="{{ url_for('admin_logs') }}" class="btn btn-secondary">📋 Ver Logs</a>
+            <a href="{{ url_for('admin_export') }}" class="btn btn-secondary">📤 Exportar Dados</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

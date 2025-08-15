@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>✏️ Editar Dados - {{ username }}</h1>
+    <a href="{{ url_for('admin_aluno_detail', username=username) }}" class="btn btn-secondary">← Voltar</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>📝 Formulário de Edição</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <label for="turma"><strong>Turma:</strong></label>
+                    <input type="text" id="turma" name="turma" value="{{ user.turma }}" 
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+                
+                <div>
+                    <label for="pontuacao"><strong>Pontuação:</strong></label>
+                    <input type="number" id="pontuacao" name="pontuacao" value="{{ user.pontuacao }}" 
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <label for="senha"><strong>Nova Senha (deixe em branco para não alterar):</strong></label>
+                <input type="password" id="senha" name="senha" placeholder="Digite nova senha..." 
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 5px; margin-top: 0.5rem;">
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+                <strong>⚠️ Atenção:</strong> Esta ação será registrada nos logs de auditoria.
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button type="submit" class="btn">💾 Salvar Alterações</button>
+                <a href="{{ url_for('admin_aluno_detail', username=username) }}" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>📊 Dados Atuais</h2>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>
+                <strong>Username:</strong><br>
+                {{ username }}
+            </div>
+            <div>
+                <strong>Turma Atual:</strong><br>
+                {{ user.turma }}
+            </div>
+            <div>
+                <strong>Pontuação Atual:</strong><br>
+                {{ user.pontuacao }} pontos
+            </div>
+            <div>
+                <strong>Questões Respondidas:</strong><br>
+                {{ user.answered_questions|length }}
+            </div>
+            <div>
+                <strong>Taxa de Acerto:</strong><br>
+                {% set accuracy = (user.correct_questions|length / user.answered_questions|length * 100) if user.answered_questions|length > 0 else 0 %}
+                {{ "%.1f"|format(accuracy) }}%
+            </div>
+            <div>
+                <strong>Combo Máximo:</strong><br>
+                {{ user.max_combo }}x
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

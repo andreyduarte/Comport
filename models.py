@@ -50,3 +50,13 @@ class UserAchievement(db.Model):
     achievement_key = db.Column(db.String(50), nullable=False)
     
     __table_args__ = (UniqueConstraint('username', 'achievement_key', name='unique_user_achievement'),)
+
+class AdminLog(db.Model):
+    __tablename__ = 'admin_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    admin_username = db.Column(db.String(50), nullable=False)
+    action = db.Column(db.String(50), nullable=False)
+    target_username = db.Column(db.String(50), nullable=True)
+    details = db.Column(db.Text, nullable=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
